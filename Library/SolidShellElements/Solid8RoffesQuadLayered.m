@@ -1,4 +1,4 @@
-classdef Solid8RoffesLayered < handle
+classdef Solid8RoffesQuadLayered < handle
     
     properties
         elprop;
@@ -14,7 +14,10 @@ classdef Solid8RoffesLayered < handle
         
         %Interpolator and Integrationrule for each element
         interp
+        interpQuad
         ir
+        
+        nDispDofs;
         
         %Submatrices are stored in case of EAS is used, and alpha is needed
         submatrices;
@@ -25,17 +28,18 @@ classdef Solid8RoffesLayered < handle
     
     methods
         
-        function obj = Solid8RoffesLayered(ex,ey,ez, elprop, M)
+        function obj = Solid8RoffesQuadLayered(ex,ey,ez, elprop, M)
             
             for i=1:elprop.nLam
                 obj.lx(:,i) = ex;
                 obj.ly(:,i) = ey;
-                obj.lz(:,i) = [[1 1 1 1]*elprop.int_coordsG(i) [1 1 1 1]*elprop.int_coordsG(i+1)]';
+                obj.lz(:,i) = [[1 1 1 1 1 1 1 1 1]*elprop.int_coordsG(i) [1 1 1 1 1 1 1 1 1]*elprop.int_coordsG(i+1)]';
             end
             obj.ex = ex; obj.ey = ey; obj.ez = ez;
             
             %Always simplest ir and intetp
             obj.interp = InterpolatorX2Y2Z2;
+            ovj.interpQuad = InterpolatorX3Y3Z3;
             obj.ir = IntegrationRule;
             obj.ir.setupCubeRule(2,2,2);
             
@@ -44,10 +48,11 @@ classdef Solid8RoffesLayered < handle
             obj.elprop = elprop;
             obj.M = M;
             
+            obj.nDispDofs = 27*3;
             nEnhDofs = size(M(0,0,0),2);
-            obj.submatrices.Ke = zeros(24);
+            obj.submatrices.Ke = zeros(obj.nDispDofs);
             obj.submatrices.He = zeros(nEnhDofs);
-            obj.submatrices.Le = zeros(nEnhDofs,24);
+            obj.submatrices.Le = zeros(nEnhDofs, obj.nDispDofs);
         end
        
         function [K,f] = computeKandf(obj)
@@ -55,10 +60,10 @@ classdef Solid8RoffesLayered < handle
             nEnhDofs = size(obj.M(0,0,0),2);
 
             %Init vectors
-            Ke = zeros(24,24);
+            Ke = zeros( obj.nDispDofs, obj.nDispDofs);
             He = zeros(nEnhDofs,nEnhDofs);
-            Le = zeros(nEnhDofs,24);
-            fe = zeros(24,1);
+            Le = zeros(nEnhDofs, obj.nDispDofs);
+            fe = zeros( obj.nDispDofs,1);
             
             for ilay = 1:obj.elprop.nLam
                 D = obj.elprop.Dmatrices(:,:,ilay);
@@ -69,8 +74,8 @@ classdef Solid8RoffesLayered < handle
                     ecoords(3) = obj.lamIr.getElementGaussCoordinate(lcoords(3), obj.elprop.int_coordsL(ilay:ilay+1));
                     
                     %Shape functions
-                    Nxieta = obj.interp.eval_N(ecoords);
-                    [dNdx, ~] = obj.interp.eval_dNdx(ecoords, obj.ex', obj.ey', obj.ez');
+                    Nxieta = obj.interpQuad.eval_N(ecoords);
+                    [dNdx, ~] = obj.interpQuad.eval_dNdx(ecoords, obj.ex', obj.ey', obj.ez');
                     [N,B] = solid8NandBmatrix(Nxieta,dNdx);
 
                     [~, detJ] = obj.interp.eval_dNdx(ecoords, obj.lx(:,ilay)', obj.ly(:,ilay)', obj.lz(:,ilay)');

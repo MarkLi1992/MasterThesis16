@@ -34,15 +34,18 @@ elseif(strcmp('HybridStress2', opt))
     side2bottomYZDofs = dof(      sideElements(2).nodes(1,:)    ,2:3);
     side2bottomYZDofs = side2bottomYZDofs(:);
     bc = [[side1bottomDofs; side2bottomYZDofs], 0*[side1bottomDofs; side2bottomYZDofs]];
+elseif(strcmp('Testdelete', opt))
+    dofsu = dof( intersect(side1,side5),1:3); dofsu = dofsu(:);
+    dofsl = dof( intersect(side1,side6),1:3); dofsl = dofsl(:);
+%     bc = [dofsu;dofsl];
+%     bc = [bc,bc*0];
     
-%     ldofs = dof(side1,:);
-%     ldofs = ldofs(:);
-%     bc = [ldofs,ldofs*0];
-%     ldofs1 = dof([side1;side2], 1:3);
-%     ldofs2 = dof([side3;side4], [1 2 3]);
-%     
-%     ldofs = [ldofs1(:); ldofs2(:)];
-%     bc = [ldofs, ldofs*0];
+    dofsl2 = dof( intersect(side2,side6),2:3); dofsl2 = dofsl2(:);
+    
+    bc = [dofsl;dofsl2];
+    bc = [bc,bc*0];
+    
+
 elseif(strcmp('MembraneUnsymmetric', opt))
     ldofs = dof(side1,1:3);
     ldofs = ldofs(:);

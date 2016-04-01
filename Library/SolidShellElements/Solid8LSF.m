@@ -63,23 +63,28 @@ classdef Solid8LSF < handle
         end
         
         function [Me,Le] = computeLSFmatrices(obj, a)
-            
-            Me = zeros(24,24);  Le = zeros(24,1);%,24);
+
+            sdim = 1;%or 3
+            Me = zeros(sdim*8,sdim*8);  Le = zeros(sdim*8,1);%,24);
             %Start loop
             for gp = obj.ir.gps
                 
                 %Shape functions
                 [Nxieta]= obj.interp.eval_N(gp.local_coords);%
-                P =  solid8NMatrix(Nxieta, 3);
+                P =  solid8NMatrix(Nxieta, sdim);
                 
                 %Jacobian transpose (but ignore middle point)
+%                 temp = [gp.local_coords(1:2), -1/sqrt(3)];
+%                 [dNdx, detJ] = obj.interp.eval_dNdx(gp.local_coords,obj.ex',obj.ey',obj.ez');
                 [dNdx, detJ] = obj.interp.eval_dNdx(gp.local_coords,obj.ex',obj.ey',obj.ez');
                 B = solid8Bmatrix(dNdx);
                 stress = obj.elprop.D*B*a;
+                stress = obj.computeStressAt(a,gp.local_coords);
                 
                 %Integrate
                 dV  = gp.weight * detJ;
-                Le = Le + P'*stress([1 2 4]) * dV;
+%                 Le = Le + P'*stress([1 2 4]) * dV;
+                Le = Le + P'*stress(1) * dV;
                 Me = Me + P'*P * dV;
                 
             end
@@ -124,6 +129,13 @@ classdef Solid8LSF < handle
             %Global coordinates
             outcoords = obj.interp.eval_N(coords) * [obj.ex,obj.ey,obj.ez];
             stresses = solid8Stress(obj.ex,obj.ey,obj.ez, a, cD, coords, obj.interp);
+            
+        end
+        
+        
+        function [] = postProcess(obj, as)
+            
+            
             
         end
 

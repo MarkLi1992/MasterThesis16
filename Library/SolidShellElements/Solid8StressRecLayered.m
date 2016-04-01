@@ -1,4 +1,4 @@
-classdef Solid8RoffesLayered < handle
+classdef Solid8StressRecLayered < handle
     
     properties
         elprop;
@@ -25,7 +25,7 @@ classdef Solid8RoffesLayered < handle
     
     methods
         
-        function obj = Solid8RoffesLayered(ex,ey,ez, elprop, M)
+        function obj = Solid8StressRecLayered(ex,ey,ez, elprop, M)
             
             for i=1:elprop.nLam
                 obj.lx(:,i) = ex;
@@ -139,109 +139,25 @@ classdef Solid8RoffesLayered < handle
             
         end
         
-        function [Tx, Ty, outcoords] = computeShearForce(obj,a, XY)
-            if ~(exist('XY','var')); XY = [0,0]; end;
-            %Interpolation and integrationRule for integration
-            interp1D = InterpolatorX2;
-            ir1d = IntegrationRule;
-            ngp_xi = 3;
-            ir1d.setupLineRule( ngp_xi);
+        function [] = postProcess(obj, as)
             
-            %Start gauss-loop
-            Tx = 0; Ty = 0;
-            for ilay = 1:obj.elprop.nLam
-                for gp = ir1d.gps
-
-                    %Layer z-coordinates
-                    lz = obj.elprop.int_coordsG([ilay, ilay+1]);
-                    
-                    %Gauss points in this layer coordinate-system
-                    lcoords = [XY(1) XY(2) gp.local_coords];
-                    
-                    %Coordinates in the element-coordinate system
-                    ecoords = lcoords;
-                    ecoords(3) = obj.lamIr.getElementGaussCoordinate(lcoords(3), obj.elprop.int_coordsL(ilay:ilay+1));
-                    
-                    %Get detJ
-                    [~, detJ] = interp1D.eval_dNdx(gp.local_coords, lz);
-                    
-                    %Get stresses
-                    [stresses, outcoords] = obj.computeStressAt(a,ecoords');
-
-                    %Integrate
-                    dz = gp.weight * detJ;
-                    Tx = Tx + stresses(5) * (dz);
-                    Ty = Ty + stresses(6) * (dz);
-                end
-            end
-
-        end
-        
-        function [] = plzPostProcces(obj,a)
-            
-            %Stiffness matrices in 2D
-            QLT = obj.elprop.D([1 2 4],[1 2 4]);
-            QLTtilde = eye(2);
-            
-            %ABD matrices
-            [A,B,D,Atilde] = ABDAtilde(QLT,QLTtilde, obj.elprop.angles, obj.elprop.int_coordsG);
-            Dhat = [A,B;B,D];
-            
-            %Compute shearforces
-            [Tx, Ty] = computeShearForce(obj,a);
-            invDhat = inv(Dhat);
-            
-            %Compute strains
-            nhatx = invDhat*[0 0 0 Tx 0 0]';
-            nhaty = invDhat*[0 0 0 0 Ty 0]';
-            
-            epsbar_x = nhatx(1:3);
-            kappa_x = nhatx(4:6);
-            epsbar_y = nhaty(1:3);
-            kappa_y = nhaty(4:6);
-            
-            %Integration rule and interpolation for all layers
-            ir1d = IntegrationRule;
-            ir1d.setupLineRule(3);
-            interp1D = InterpolatorX2;
-            
-            %Derivatives of episolon
-            %             eps_x = @(z) nhatx(1:3) + z*nhatx(4:6);
-            %             eps_y = @(z) nhaty(1:3) + z*nhaty(4:6);
-
-            %Boolean matrices
-            Bx = [1 0 0; 0 0 1]; By = [0 0 1; 0 1 0];
-            
-            TauFunk = @(z, zminus, zmid, QLT) Bx*QLT*( z*(epsbar_x + kappa_x*(z*0.5-zmid))   -    zminus*(epsbar_x + kappa_x*(zminus*0.5-zmid)) ) +...
-                                              By*QLT*( z*(epsbar_y + kappa_y*(z*0.5-zmid))   -    zminus*(epsbar_y + kappa_y*(zminus*0.5-zmid)) );
-            
-%             TauFunk = @(z, zminus, QLT) Bx*QLT*z*(epsbar_x + 0.5*z*kappa_x) + By*QLT*z*(epsbar_y + 0.5*z*kappa_y) +...
-%                            Bx*QLT*zminus*(epsbar_x + 0.5*zminus*kappa_x) + By*QLT*zminus*(epsbar_y + 0.5*zminus*kappa_y);
-            
-            %integrate
             Taubc = [0,0]';
-            tauItr = 1;
-            zmid = 0%(obj.elprop.int_coordsG(1) + obj.elprop.int_coordsG(end))/2;
-%             zmid2 = (obj.elprop.int_coordsG(1) + obj.elprop.int_coordsG(end))/2;
             for ilay = 1:obj.elprop.nLam
-               QLT = obj.elprop.Dmatrices([1 2 4],[1 2 4],ilay);
-                       
+                
                 zminus = obj.elprop.int_coordsG(ilay);
                 zplus  = obj.elprop.int_coordsG(ilay+1);
                 
                 zpoints = linspace(zminus,zplus,6);
                 for iz = 1:length(zpoints);
-                    Tau(1:2, tauItr) = TauFunk(zpoints(iz), zminus, zmid, QLT) + Taubc;
+                    sig_xz(1:2, tauItr) = sigxx_x*(zpoints(iz)-zminus) + sigxy_x*(zpoints(iz)-zminus) + Taubc;
+                    
                     zplot(1, tauItr) = zpoints(iz);
                     tauItr = tauItr+1;
                 end
                 
-                Taubc = Tau(:,end);
-                
+                Taubc = sig_xz(:,end);
             end
-            figure
-            plot(-Tau(1,:), zplot);
-            keyboard;
+            
         end
         
         function [el] = getLayerFromZCoord(obj,zc,opt)

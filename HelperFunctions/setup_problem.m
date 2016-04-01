@@ -29,7 +29,7 @@ switch problem
         
     case 'KonsolMedUtbredd'
         lx = 0.1; ly=0.01; lz = 0.002;
-        nelx = 20; nely=1; nelz=1;
+        nelx = 2; nely=1; nelz=1;
         
         tractionInfo.sides = [5];
         tractionInfo.tractions = {@(x,y) [0 0 -50/(lx*ly)]'};
@@ -57,7 +57,7 @@ switch problem
         D = hooke(4,100e9,0);
     case 'Konsol'
         lx = 0.1; ly=0.01; lz = 0.002;
-        nelx = 10; nely=1; nelz=1;
+        nelx = 20; nely=1; nelz=1;
         
         tractionInfo.sides = [2];
         tractionInfo.tractions = {@(x,y) [0,0, -50/(lz*ly)]'};

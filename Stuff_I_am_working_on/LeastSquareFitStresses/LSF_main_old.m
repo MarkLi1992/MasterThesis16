@@ -1,7 +1,7 @@
 clear variables 
 
 %Set up propblem
-problem = 'Konsol' %MedUtbredd
+problem = 'KonsolMedUtbredd' %MedUtbredd
 [mesh, elprop, M, bc, ftrac] = setup_problem(problem);
 
 %Assemble
@@ -57,7 +57,7 @@ for i=1:mesh.nel
     m = sdof(mesh.nomesh(:,i),:)'; m = m(:);
     m2 = mesh.edof(:,i);
     sedof(:,i) = m;
-    [ Qe, Le ] = LSFstress(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D);
+    [ Qe, Le ] = LSFstress(mesh.ex(:,i), mesh.ey(:,i), mesh.ez(:,i), elprop.D);
     Q(m,m) = Qe; 
     L(m,m2) = Le;
 end

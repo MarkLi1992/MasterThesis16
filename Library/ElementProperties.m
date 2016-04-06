@@ -43,7 +43,10 @@ classdef ElementProperties < handle
                 obj.Dmatrices(:,:,id) = T1^-1 * D * T2;
             end
             
-            
+            for i=1:obj.nLam
+               ind = (1:2) + (i-1);
+               obj.lamZCoordsG(:,i) = obj.int_coordsG(ind)'; 
+            end
         end
         
         

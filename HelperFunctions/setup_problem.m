@@ -29,18 +29,29 @@ switch problem
         
     case 'KonsolMedUtbredd'
         lx = 0.1; ly=0.01; lz = 0.002;
-        nelx = 2; nely=1; nelz=1;
+        nelx = 10; nely=1; nelz=1;
         
+        %Traction force
         tractionInfo.sides = [5];
         tractionInfo.tractions = {@(x,y) [0 0 -50/(lx*ly)]'};
         
-        angles = [0];
-        D = hooke(4,100e9,0);
+        %angles
+        angles = [0 90 0 90];
+        
+        %Material properties
+        EL = 174.6E9;
+        ET = 7E9;
+        nuLT = 0.25;
+        GLT = 3.5E9;
+        GTT = 1.4E9;
+        nuTL = ET/EL*nuLT;
+        
+        D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+%         D = hooke(4,100e9,0);
     case 'HybridStress2'
-        %A         B       H
         lx = 0.1; ly=0.01; lz = 0.01;
-        nelx = 20; nely=1; nelz=1;
-        %         lx/lz
+        nelx = 10; nely=1; nelz=1;
+
         tractionInfo.sides = [5];
         tractionInfo.tractions = {@(x,y) [0 0 -5/(lx*ly)]'};%*sin(pi*y/ly)
         
@@ -53,8 +64,8 @@ switch problem
         GTT = 1.4E9;
         nuTL = ET/EL*nuLT;
         
-        %         D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
-        D = hooke(4,100e9,0);
+%         D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+D = hooke(4,100e9,0);
     case 'Konsol'
         lx = 0.1; ly=0.01; lz = 0.002;
         nelx = 20; nely=1; nelz=1;
@@ -109,15 +120,24 @@ switch problem
         
     case 'KonsolMedUtbredd_stacked'
         lx = 0.1; ly=0.01; lz = 0.002;
-        nelx = 20; nely=2; nlamel=1;
+        nelx = 20; nely=2; nlamel=6;
         
         tractionInfo.sides = [5];
         tractionInfo.tractions = {@(x,y) [0 0 -50/(lx*ly)]'};
         
         angles = [0];
         nlam = length(angles);
-        D = hooke(4,100e9,0);
+        %Material properties
+        EL = 174.6E9;
+        ET = 7E9;
+        nuLT = 0.25;
+        GLT = 3.5E9;
+        GTT = 1.4E9;
+        nuTL = ET/EL*nuLT;
         
+        D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+        
+        %independent mesh
         m = Mesh();
         m.create_cube_mesh_stacked_solid_elements(lx,ly,lz,nelx,nely,nlam, nlamel);
         

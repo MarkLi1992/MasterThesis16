@@ -1,8 +1,8 @@
 clear variables
 syms x y z real
 
-xx = lagInterPolSyms(x, [-1 0 1])
-yy = lagInterPolSyms(y, [-1 0 1])
+xx = lagInterPolSyms(x, [-1 1])
+yy = lagInterPolSyms(y, [-1 1])
 % zz = lagInterPolSyms(z, [-1 -0.5 0 0.5 1])%[-1 -0.75 -0.5 -0.25 0 0.25 0.5 0.75 1])
 zz = lagInterPolSyms(z, linspace(-1 , 1 , 3));%[-1 -1/3 1/3 1])
 
@@ -26,13 +26,13 @@ B = [diff(N(x,y,z),x); diff(N(x,y,z),y); diff(N(x,y,z),z)]
 
 %1D for z
 syms z real
-zz = lagInterPolSyms(z, linspace(-1 , 1 , 3));%[-1 -1/3 1/3 1])
+zz = lagInterPolSyms(z, linspace(-1 , 1 , 4));%[-1 -1/3 1/3 1])
 
-hej(x,y,z) = zz{1};
-hej(x,y,z) = zz;
-N(x,y,z) = hej; 
+hej(z) = zz{1};
+hej(z) = zz;
+N(z) = hej; 
 
-B = [diff(N(x,y,z),z)]
+B = [diff(N(z),z)]
 
 
 % for iz = [-1 0 1]

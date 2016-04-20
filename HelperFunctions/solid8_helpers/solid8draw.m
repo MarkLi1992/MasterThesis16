@@ -1,7 +1,11 @@
-function [ ] = solid8draw( ex,ey,ez, nnodes)
+function [ ] = solid8draw( ex,ey,ez, nnodes, opt)
 
 if (~exist('nnodes','var'))
    nnodes = 8; 
+end
+
+if (~exist('opt','var'))
+   opt = 'k';
 end
 
 nel = size(ex,2);
@@ -26,7 +30,7 @@ for ie = 1:nel
    drawy = cel(order,2);
    drawz = cel(order,3);
    
-   plot3(drawx,drawy,drawz,'k'); 
+   plot3(drawx,drawy,drawz,opt(1)); 
    
 end
 hold off;

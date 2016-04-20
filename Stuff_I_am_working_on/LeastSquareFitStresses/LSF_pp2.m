@@ -10,6 +10,13 @@ nLam = el(1).elprop.nLam;
 %smear stresses to nodes
 ips_a = smearInPlaneStressesToNodes(mesh, el, a);
 
+%surf plot the streeses
+es_xx = ips_a(2:3:end,1);
+es_xx = es_xx(mesh.nomesh);
+% es_plot    = es_xx(1:4);
+figure
+fill(mesh.ex([1 2 4 3],:),mesh.ey([1 2 4 3],:), es_xx([1 2 4 3],:));
+
 %Get postprocessed shear stresses
 clear tau_xz tau_yz
 es_xz = zeros(3,mesh.nel,nLam); es_yz = zeros(3,mesh.nel,nLam);
@@ -53,7 +60,9 @@ end
 
 
 %%Plot
-plotEl = [5];
+plotEl = 203%805%90%50% 203%[ceil((mesh.nelx*mesh.nely)/2)]%[6];
+% plotEl = plotEl;
+figure
 for iel = plotEl
     zpoints_local = linspace(-1,1,20);
     zpoints_global = linspace(0,mesh.lz,20);
@@ -70,24 +79,52 @@ for iel = plotEl
         end
     end
     
-    figure
-    title('\sigma_{xz}')
+    subplot(2,3,4)
     plot(plot_tauxz, plot_zz,'k');
-    xlabel('Thickness'); ylabel('\sigma')
+    title(sprintf('sigma_{xz} - Element %i', iel))
+    ylabel('Thickness'); xlabel('\sigma')
     
-    figure
-    title('\sigma_{zz}')
+    subplot(2,3,5)
+    plot(plot_tauyz, plot_zz,'k');
+    title(sprintf('sigma_{yz} - Element %i',iel))
+    ylabel('Thickness'); xlabel('\sigma')
+    
+    subplot(2,3,6)
     plot(plot_sigzz, plot_zz,'k');
-    xlabel('Thickness'); ylabel('\sigma')
+    title(sprintf('sigma_{zz} - Element %i',iel))
+    ylabel('Thickness'); xlabel('\sigma')
 end
+%inplanestresses
+[stresses, zco] = el(plotEl).computeStressThroughThickness(ed(:,plotEl),[0; 0]);
+
+subplot(2,3,3)
+plot_sigxy = stresses.stress(4,:);
+plot(plot_sigxy,zco(3,:),'k');
+title(sprintf('sigma_{xy} - Element %i',iel))
+ylabel('Thickness'); xlabel('\sigma')
+
+subplot(2,3,2)
+plot_sigyy = stresses.stress(2,:);
+plot(plot_sigyy,zco(3,:),'k');
+title(sprintf('sigma_{yy} - Element %i',iel))
+ylabel('Thickness'); xlabel('\sigma')
+
+subplot(2,3,1)
+plot_sigxx = stresses.stress(1,:);
+plot(plot_sigxx,zco(3,:),'k');
+title(sprintf('sigma_{xx} - Element %i',iel))
+ylabel('Thickness'); xlabel('\sigma')
+
+
+% save('sr_e3_stresses','plot_tauxz','plot_sigzz','plot_zz','plot_sigxx', 'zco');
+
+
 
 
 % return
 % as = smearStrainsToNodes(mesh, el, a);
 % es = as(sedof);
 % el(postEl).postProcess2(es(:,postEl))
-
-
 
 % sdim = 3;
 % sedof = zeros(sdim*8,mesh.nel);

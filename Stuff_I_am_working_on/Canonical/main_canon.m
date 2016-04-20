@@ -3,11 +3,12 @@ clear variables;
 
 %Mesh data
 lx = 0.1; ly=0.01; lz = 0.002; %lx = 0.1; ly=0.01; lz = 0.02;
-nelx = 50; nely=1; nelz=1;
-ndofsno = 9; %Number of dofs per node
+nelx = 10; nely=1; nelz=1;
+ndofsno = 3; %Number of dofs per node
 P = -900; %force 4000
-[edof,coord,ex,ey,ez,dof,nel,ndofs,nno, sideElements] = cubeMesher2(lx,ly,lz,nelx,nely,nelz,ndofsno);
-neldofs = 8*ndofsno;
+% [edof,coord,ex,ey,ez,dof,nel,ndofs,nno, sideElements] = cubeMesher2(lx,ly,lz,nelx,nely,nelz,ndofsno);
+[edof,coord,ex,ey,ez,dof,nel,ndofs,nno,nomesh,sideElements] = cubeMesher(lx,ly,lz, nelx,nely,nelz, 4,4,4, 3)
+neldofs = 64*ndofsno;
 
 %Material data
 E = 210e9; nu = 0.3;
@@ -20,9 +21,10 @@ cols = zeros(n,1);
 data = zeros(n,1);
 
 nPassed = 1; f=zeros(ndofs,1);
+[Ke,fe] = solid64e(ex(:,1)', ey(:,1)', ez(:,1)', D, [0,0,-1*0]', [10,10,10]);
 for elIndex = 1:nel
     % Compute element stiffness
-    [Ke,fe] = canon8e(ex(:,elIndex)', ey(:,elIndex)', ez(:,elIndex)', D, [0,0,-1*0]', [2,2,2]);
+    
 %     [Ke,fe] = lsf8e(ex(:,elIndex)', ey(:,elIndex)', ez(:,elIndex)', D, [0,0,-1*0]', [2,2,2]);
     elDofs = edof(:,elIndex);
     % Assemble
@@ -42,8 +44,8 @@ K = sparse(rows,cols,data);
 
 %Boundary force at end
 % [bc] = cubeBC('Testdelete', dof(:,7:9), sideElements);
-[bc] = cubeBC('Testdelete', dof(:,7:9), sideElements);
-f(dof(sideElements(5).nodes(:),9)) = P/length(dof(sideElements(5).nodes(:),9));
+[bc] = cubeBC('KonsolMedUtbredd', dof(:,1:3), sideElements);
+f(dof(sideElements(5).nodes(:),3)) = P/length(dof(sideElements(5).nodes(:),3));
 
 %Solve
 a = solveq(K,f,bc);
@@ -52,7 +54,8 @@ a = solveq(K,f,bc);
 ed = a(edof);
 
 %Eulerbern
-maxDisp = max(abs(a(9:9:end)));
+% maxDisp = max(abs(a(9:9:end)));
+maxDisp = max(abs(a));
 II = (ly*lz^3/12);
 EBmaxdisp = P*lx^3/3/E/II; %last term is I
 

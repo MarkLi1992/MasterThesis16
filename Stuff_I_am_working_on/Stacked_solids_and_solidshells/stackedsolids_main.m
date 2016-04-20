@@ -1,9 +1,9 @@
 clear variables 
 %Set up propblem
-problem = 'Konsol_stacked' %MedUtbredd
+problem = ['KonsolMedUtbredd','_stacked'] %KonsolMedUtbredd   InspandPlatta
 fprintf('Meshing\n');
 [mesh, elprop, M, bc, ftrac] = setup_problem(problem);
-eq = [0 0 0]'; 
+eq = [0 0 -10000]'; 
 
 %Assemble
 n = mesh.nel*(mesh.neldofs)^2;
@@ -13,7 +13,7 @@ nPassed = 1; f=zeros(mesh.ndofs,1);
 %Get stiffnessmatrix onece
 el(1) = Solid8EasLayered(mesh.ex(:,1), mesh.ey(:,1), mesh.ez(:,1), elprop, mesh.nlamel, M);
 % el(1) = Solid8layered(mesh.ex(:,1), mesh.ey(:,1), mesh.ez(:,1), elprop, mesh.nlamel);
-[Ke, fe] = el(1).computeKandf();
+[Ke, fe] = el(1).computeKandf(eq);
 
 fprintf('Assembling %i x %i elements\n',mesh.nel, mesh.nlamel);
 for elIndex = 1:mesh.nel
@@ -46,7 +46,7 @@ clear rows cols data
 fprintf('Solving\n');
 a = solveq(K,f,bc);
 
-maxabs_a = max(abs(a));
+maxabs_a = max(abs(a))
 fprintf('Completed\n');
 
 

@@ -23,7 +23,7 @@ elseif(strcmp('FrittUpplagt', opt))
 
     ldofs = ldofs(:);
     bc = [[ldofs;ldofs2],[ldofs;ldofs2]*0];
-elseif(strcmp('InspandPlatta', opt))
+elseif strcmp('InspandPlatta', opt) || strcmp('InspandPlatta_stacked',opt)
     ldofs = dof([side1;side2;side3;side4], 1:3);
     ldofs = ldofs(:);
     bc = [ldofs, ldofs*0];
@@ -51,19 +51,10 @@ elseif(strcmp('MembraneUnsymmetric', opt))
     ldofs = ldofs(:);
     bc = [ldofs,ldofs*0];
     
-elseif(strcmp('TestUdiscont', opt))
-    global stepp
-    if(stepp == 1)
-        ldofs = dof(side1,:);
-        ldofs = ldofs(:);
-        bc = [ldofs,ldofs*0];
-    else
-        global eldisp
-        lowdofs = dof(side6,:)';
-        updofs  = dof(side5,:)';
-        dofs = [lowdofs(:);updofs(:)];
-        bc = [dofs, eldisp];
-    end
+elseif(strcmp('test_stacked', opt))
+    ldofs = dof(side1,1:3);
+    ldofs = ldofs(:);
+    bc = [ldofs,ldofs*0];
 else
     error('nope');
 end

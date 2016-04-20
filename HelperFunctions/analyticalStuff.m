@@ -10,5 +10,8 @@ tauxz = @(x,z,b,h,L,q) 3/2/(b*h)*(1 - (z/(h/2)).^2)*q*(L-x); %q ? [N/m]
 sigzz = @(x,z,b,h,L,q) (q*(h-z).*(h + 2*z).^2)/(2*(b*h)*h^2);
 eb_maxdisp = @(P,ly,lx,E,Iy) abs((P)*lx^4)/(8*E*Iy); %P = [N/m]
 
+
+%rect: Iy = b*h^3/12
+%cyli: Iy = pi*r^3*t
 end
 

@@ -72,7 +72,7 @@ classdef Solid8EasLayered < handle
             obj.M = M;
         end
         
-        function [K,f] = computeKandf(obj)
+        function [K,f] = computeKandf(obj,eq)
             
             K = zeros(obj.intNdofs);
             f = zeros(obj.intNdofs,1);
@@ -84,7 +84,7 @@ classdef Solid8EasLayered < handle
                 cex = obj.ex(:,iel); cey = obj.ey(:,iel); cez = obj.ez(:,iel);
                 cM = obj.M;
                 
-                eq = [0,0,0]';
+%                 eq = [0,0,0]';
                 [Kout, fout, Ke, He, Le ] = solid8EasLayeredElement(cex',cey',cez',cD,cM,eq, obj.interp, obj.ir);
                 
                 K(cedof,cedof) = K(cedof,cedof) + Kout;
@@ -279,16 +279,20 @@ He = zeros(nEnhDofs,nEnhDofs);
 Le = zeros(nEnhDofs,24);
 fe = zeros(24,1);
 
+[~, detJ0, JT0] = interp.eval_dNdx([0,0,0], ex, ey, ez);
+
 %Start loop
 for gp= ir.gps
     
     %Shape functions
     Nxieta = interp.eval_N(gp.local_coords);
-    [dNdx, detJ] = interp.eval_dNdx(gp.local_coords, ex, ey, ez);
+    [dNdx, detJ, JT] = interp.eval_dNdx(gp.local_coords, ex, ey, ez);
     [N,B] = solid8NandBmatrix(Nxieta,dNdx);
     
     %Enanced part
-    M = Mi(gp.local_coords(1),gp.local_coords(2),gp.local_coords(3));
+    Mtemp = Mi(gp.local_coords(1),gp.local_coords(2),gp.local_coords(3));
+    T0 = transMat( JT0 );
+    M = detJ0/detJ * T0*Mtemp;
     
     %Integrate
     Ke = Ke + B'*D*B * (detJ*gp.weight);

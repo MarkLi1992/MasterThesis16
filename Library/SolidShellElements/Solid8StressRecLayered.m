@@ -55,7 +55,7 @@ classdef Solid8StressRecLayered < handle
             obj.submatrices.Le = zeros(nEnhDofs,24);
         end
        
-        function [K,f] = computeKandf(obj)
+        function [K,f] = computeKandf(obj, eq)
             
             nEnhDofs = size(obj.M(0,0,0),2);
 
@@ -65,6 +65,7 @@ classdef Solid8StressRecLayered < handle
             Le = zeros(nEnhDofs,24);
             fe = zeros(24,1);
             
+            [~, detJ0, JT0] = obj.interp.eval_dNdx([0,0,0], obj.ex', obj.ey', obj.ez');
             for ilay = 1:obj.elprop.nLam
                 D = obj.elprop.Dmatrices(:,:,ilay);
                 for gp = obj.lamIr.irs(ilay).gps
@@ -79,15 +80,18 @@ classdef Solid8StressRecLayered < handle
                     [N,B] = solid8NandBmatrix(Nxieta,dNdx);
 
                     [~, detJ] = obj.interp.eval_dNdx(ecoords, obj.lx(:,ilay)', obj.ly(:,ilay)', obj.lz(:,ilay)');
+                   
                     %Enanced part
-                    Mi = obj.M(ecoords(1),ecoords(2),ecoords(3));
+%                      Mi = obj.M(ecoords(1),ecoords(2),ecoords(3));
+                    Mtemp = obj.M(ecoords(1),ecoords(2),ecoords(3));
+                    T0 = transMat( JT0 );
+                    Mi = detJ0/detJ * T0*Mtemp;
                     
                     %Integrate
                     Ke = Ke + B'*D*B * (detJ*gp.weight);
                     He = He + Mi'*D*Mi * (detJ*gp.weight);
                     Le = Le + Mi'*D*B * (detJ*gp.weight);
                     
-                    eq = [0,0,0]';
                     fe = fe + N'*eq * (detJ*gp.weight);
                 end
             end
@@ -116,15 +120,12 @@ classdef Solid8StressRecLayered < handle
                 coord2 =  [ local_point z2];
                 
                 [stresses_bot] = solid8EasLayeredStress(obj.ex,obj.ey,obj. ez,a,alpha,...
-                                                       obj.elprop.Dmatrices(:,:,ilay), obj.M, coord1, obj.interp)
+                                                       obj.elprop.Dmatrices(:,:,ilay), obj.M, coord1, obj.interp);
                 [stresses_top] = solid8EasLayeredStress(obj.ex, obj.ey, obj.ez, a,alpha,...
-                                                       obj.elprop.Dmatrices(:,:,ilay), obj.M, coord2, obj.interp)
+                                                       obj.elprop.Dmatrices(:,:,ilay), obj.M, coord2, obj.interp);
                 stresses(:,:,ilay) = [stresses_bot, stresses_top];
             end
-                
 
-            
-            
         end
         
         function [stresses, outcoords] = computeStressThroughThickness(obj,a, local_points)
@@ -268,8 +269,8 @@ classdef Solid8StressRecLayered < handle
                         dz = detJ * gp.weight;
                         
                         if(dim == 3) %If integration shear stress
-                        integral_temp(1) = integral_temp(1) + (stressGrads(1) + stressGrads(6)) * dz;
-                        integral_temp(2) = integral_temp(2) + (stressGrads(5) + stressGrads(3)) * dz;
+                        integral_temp(1) = integral_temp(1) + -(stressGrads(1) + stressGrads(6)) * dz;
+                        integral_temp(2) = integral_temp(2) + -(stressGrads(5) + stressGrads(3)) * dz;
                         elseif(dim == 2) %If integrating normal stress
                         integral_temp = integral_temp + (stressGrads(1) + stressGrads(3)) * dz;    
                         end
@@ -333,7 +334,7 @@ classdef Solid8StressRecLayered < handle
                         stressGrads = evalGradients( obj.lx3(:,ilay), obj.ly3(:,ilay), obj.lz3(:,ilay), TauInterp, current_as, [0,0,stressEvalPoint] , 2);
                        
                         dz = detJ * gp.weight;                        
-                        integral_temp = integral_temp + (stressGrads(1) + stressGrads(3)) * dz;    
+                        integral_temp = integral_temp + -(stressGrads(1) + stressGrads(3)) * dz;    
 
                     end
                     
@@ -394,6 +395,7 @@ zeta=coord(3);
 B = solid8Bmatrix(dNdx);
 
 %EAS part
+warning('tfont forget to transforom)');
 M = Mi(xi,eta,zeta);
 
 strains =  B*a + M*alpha;

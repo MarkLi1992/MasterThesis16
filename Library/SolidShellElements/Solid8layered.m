@@ -65,7 +65,7 @@ classdef Solid8layered < handle
             obj.elprop = elprop;
         end
         
-        function [K,f] = computeKandf(obj)
+        function [K,f] = computeKandf(obj,eq)
             
             K = zeros(obj.intNdofs);
             f = zeros(obj.intNdofs,1);
@@ -77,7 +77,7 @@ classdef Solid8layered < handle
                 cex = obj.ex(:,iel); cey = obj.ey(:,iel); cez = obj.ez(:,iel);
                 
                 
-                eq = [0,0,0]';
+%                 eq = [0,0,0]';
                 [Kout, fout] = solid8LayeredElement(cex',cey',cez',cD,eq, obj.interp, obj.ir);
         
                 K(cedof,cedof) = K(cedof,cedof) + Kout;

@@ -12,6 +12,8 @@ for i= 1:size(nnn,1)
 end
 
 figure
-plot(disp3)
-
+plot(prod(nnn,2),disp3)
+ylabel('Defl'); xlabel('Number of elements')
 %save('convCheck_s','disp3','nnn')
+
+

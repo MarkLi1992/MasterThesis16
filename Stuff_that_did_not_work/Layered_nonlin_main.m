@@ -4,9 +4,9 @@ clear variables;
 % addpath(genpath('HelperFunctions'))
 
 % problem = 'Konsol';
-% problem = 'KonsolMedUtbredd';
+problem = 'KonsolMedUtbredd';
 % problem = 'InspandPlatta';
-problem = 'HybridStress2';
+% problem = 'HybridStress2';
 % problem = 'MembraneUnsymmetric';
 
 [mesh, elprop, M, bc, ftrac] = setup_problem(problem);
@@ -49,10 +49,10 @@ while err > tol
         
         elDofs = mesh.edof(:,elIndex);
         ae = a(elDofs);
-        
+        fe_in = (ftrac(elDofs)); %zeros(size(ftrac(elDofs)));%ftrac(:,elIndex);
 %         Re = el(elIndex).computeR(ae, eq, ftrac(elDofs), elprop);
 %         Ke = el(elIndex).computeJ(ae,elprop);  
-        [Re, Ke] = el(elIndex).computeRandJ(ae, eq, ftrac(:,elIndex), elprop);
+        [Re, Ke] = el(elIndex).computeRandJ(ae, eq, fe_in, elprop);
 
         % Assemble
         for j = 1:mesh.neldofs

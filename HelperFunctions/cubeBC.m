@@ -44,8 +44,7 @@ elseif(strcmp('Testdelete', opt))
     
     bc = [dofsl;dofsl2];
     bc = [bc,bc*0];
-    
-
+   
 elseif(strcmp('MembraneUnsymmetric', opt))
     ldofs = dof(side1,1:3);
     ldofs = ldofs(:);
@@ -55,6 +54,11 @@ elseif(strcmp('test_stacked', opt))
     ldofs = dof(side1,1:3);
     ldofs = ldofs(:);
     bc = [ldofs,ldofs*0];
+    
+elseif(strcmp('CurvedBeam', opt)) || strcmp('CurvedBeam_stacked',opt)
+    ldofs1 = dof(unique(side4),1:3);
+    ldofs1 = ldofs1(:);
+    bc = [ldofs1,ldofs1*0];
 else
     error('nope');
 end

@@ -95,10 +95,14 @@ for iz=0:(nnozel-1):totnnoz-nnozel
             icel = icel+1;
             temp = nodelayout((1:nnoxel) + ix,(1:nnoyel) +iy,(1:nnozel) + iz);
             temp = reshape(temp,1,nelno,1);
-            %             temp(3:4) = temp([4 3]); temp([7 8]) = temp([8 7]);
-            %             for itt=1:nnozel
-            %                 temp((3:4) + 4*(itt-1)) = temp(fliplr((3:4) + 4*(itt-1)))
-            %             end
+            
+            %----
+%                         temp(3:4) = temp([4 3]); temp([7 8]) = temp([8 7]);
+%                         for itt=1:nnozel
+%                             temp((3:4) + 4*(itt-1)) = temp(fliplr((3:4) + 4*(itt-1)))
+%                         end
+            %----
+            
             mesh(icel,:) = temp;
             edof(icel,:) = reshape(dof(temp,:)',1,nelno*ndofsno);
             

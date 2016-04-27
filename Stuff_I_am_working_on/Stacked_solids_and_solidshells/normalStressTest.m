@@ -12,12 +12,9 @@ nPassed = 1; f=zeros(mesh.ndofs,1);
 
 for elIndex = 1:mesh.nel
     
-%     el(elIndex) = Solid8LSF(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop);Solid8StressRecLayered
-    el(elIndex) = Solid8StressRecLayered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
     eq = [0 0 0]';
-    [Ke, fe] = el(elIndex).computeKandf(eq);
-%     [ Ke,fe ] = solid8(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, eq,[3,3,3]);
-%     [ Ke,fe ] = solid8anseas(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, M, eq,[3,3,3]);
+    [Ke,fe] = soli8e(mesh.ex(:,elIndex)', mesh.ey(:,elIndex)', mesh.ez(:,elIndex)', 2,elprop.D, eq);
+%     [Ke,fe] = solid8(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex),elprop.D, eq,[3,3,3]);
     
     % Assemble
     elDofs = mesh.edof(:,elIndex);
@@ -30,7 +27,6 @@ for elIndex = 1:mesh.nel
         end
     end
     f(elDofs) = f(elDofs) + fe;
-%     fprintf('Assembling for element %i \n',elIndex);
 end
 
 %Add traction forces
@@ -59,3 +55,31 @@ figure;
 solid8draw(exd,eyd,ezd); hold on;
 view(3)
 axis equal
+
+%Calulate stresses
+ielitr = 1; figure; calfemzz = linspace(-1,1, mesh.nelz*2);
+for iel=   6:11:(mesh.nelx*mesh.nelz)
+    
+    zz = [-1 0 1];
+    for iz = 1:length(zz)
+%     [strain(:,iz), stress(:,iz), xyzpoint(:,iz) ] = solid8Stress(mesh.ex(:,iel),mesh.ey(:,iel),mesh.ez(:,iel),ed(:,iel),elprop.D, [0,0,zz(iz)]);
+%     [estmp ] = soli8s(mesh.ex(:,iel)',mesh.ey(:,iel)',mesh.ez(:,iel)',2,elprop.D,ed(:,iel)');
+%     stress = [stress, estmp([1,5],:)'];
+    end
+    
+    %---CALFEM
+    xyzpoint = []; stress  =[];
+    [estmp ] = soli8s(mesh.ex(:,iel)',mesh.ey(:,iel)',mesh.ez(:,iel)',2,elprop.D,ed(:,iel)');
+    stress = [estmp([1,5],:)'];
+    xyzpoint(3,:) = calfemzz( (1:2)  + (2*(ielitr-1)) )
+    %----
+    
+    scmp = 3;
+    plot(stress(scmp,:), xyzpoint(3,:)); hold on;
+    
+    ielitr = ielitr +1;
+end
+
+
+
+

@@ -11,11 +11,11 @@ nLam = el(1).elprop.nLam;
 ips_a = smearInPlaneStressesToNodes(mesh, el, a);
 
 %surf plot the streeses
-es_xx = ips_a(2:3:end,1);
-es_xx = es_xx(mesh.nomesh);
+% es_xx = ips_a(2:3:end,1);
+% es_xx = es_xx(mesh.nomesh);
 % es_plot    = es_xx(1:4);
-figure
-fill(mesh.ex([1 2 4 3],:),mesh.ey([1 2 4 3],:), es_xx([1 2 4 3],:));
+% figure
+% fill(mesh.ey([1 5 7 3],:),mesh.ez([1 5 7 3],:), es_xx([1 5 7 3],:)); %fill(mesh.ey([1 2 4 3],:),mesh.ez([1 2 4 3],:), es_xx([1 2 4 3],:));
 
 %Get postprocessed shear stresses
 clear tau_xz tau_yz
@@ -60,7 +60,7 @@ end
 
 
 %%Plot
-plotEl = 203%805%90%50% 203%[ceil((mesh.nelx*mesh.nely)/2)]%[6];
+plotEl = 6%805%90%50% 203%[ceil((mesh.nelx*mesh.nely)/2)]%[6];
 % plotEl = plotEl;
 figure
 for iel = plotEl
@@ -96,6 +96,7 @@ for iel = plotEl
 end
 %inplanestresses
 [stresses, zco] = el(plotEl).computeStressThroughThickness(ed(:,plotEl),[0; 0]);
+[stresses, zco] = el(plotEl).computeStressThroughLayers(ed(:,plotEl),[0 0]);
 
 subplot(2,3,3)
 plot_sigxy = stresses.stress(4,:);
@@ -116,7 +117,7 @@ title(sprintf('sigma_{xx} - Element %i',iel))
 ylabel('Thickness'); xlabel('\sigma')
 
 
-% save('sr_e3_stresses','plot_tauxz','plot_sigzz','plot_zz','plot_sigxx', 'zco');
+% save('sr_e12_stresses','plot_tauxz','plot_sigzz','plot_zz','plot_sigxx', 'zco');
 
 
 

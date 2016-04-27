@@ -9,22 +9,24 @@ eb_maxdisp = @(P,ly,lx,E,Iy) abs((P)*lx^4)/(8*E*Iy); %P = [N/m]
 
 % Compare deflections between FEM and EB
 % eb_maxdisp = eb_maxdisp(P,mesh.ly,mesh.lx, E,Iy);
-fprintf('EulerBernoulli: %.10f, SolidElement: %.10f\n',eb_maxdisp(50/mesh.lx,mesh.ly,mesh.lx, 100e9 ,Iy),maxDisp);
+fprintf('EulerBernoulli: %.10f, SolidElement: %.10f\n',eb_maxdisp(-100,mesh.ly,mesh.lx, 100e9 ,Iy),maxDisp);
 
 elementsToPlot = coordinate2element(mesh.ex,mesh.ey,mesh.ez, [mesh.lx/2, mesh.ly/2, mesh.lz/2]); % 
 for iel = elementsToPlot
 
     [stressComp,zcoordsComp]  = el(iel).computeCompatibleStressThroughThickness(a(mesh.edof(:,iel)), elprop);
-    plotCompStress = stressComp(5,:);
+    plotCompStress = stressComp(3,:);
     
     [stress,zcoords] = el(iel).computeStressThroughThickness();
-    plotStress = stress(2,:);
+    plotStress = stress(1,:);
 
     figure
     plot(plotStress,zcoords);%, plotZZglobal); 
     hold on;
     plot(plotCompStress,zcoordsComp,'*'); 
     legend('Stress','Compatible stress')
-    keyboard;
+%     keyboard;
     
 end
+
+save('ssx_e1_stresses','stress','zcoords','plotCompStress','zcoordsComp');

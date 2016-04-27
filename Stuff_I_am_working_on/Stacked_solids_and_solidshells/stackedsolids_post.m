@@ -3,8 +3,8 @@
 ed = a(mesh.edof);
 
 %Eb
-Iy = mesh.ly*mesh.lz^3/12; eb_maxdisp = abs((-50)*mesh.lx^4)/(8*100e9*Iy); 
-maxabs_a = max(abs(a));
+% Iy = mesh.ly*mesh.lz^3/12; eb_maxdisp = abs((-100)*mesh.lx^4)/(8*100e9*Iy); 
+% maxabs_a = max(abs(a));
 
 %Draw if you want to
 iwanttotdraw = 0;
@@ -22,12 +22,12 @@ if(iwanttotdraw == 1)
 end
 
 %Find element at coordinate
-plotEl = coordinate2element(mesh.ex,mesh.ey,mesh.ez, [mesh.lx/2, mesh.ly/2, mesh.lz/2])
-% plotEl = 203%805%90%50;
+% plotEl = coordinate2element(mesh.ex,mesh.ey,mesh.ez, [mesh.lx/2, mesh.ly/2, mesh.lz/2])
+plotEl = 1125%805%90%50;
 %Get the stresses through the thickness at some points in a element
 % stressesAtPoints = [-1, 1 1 -1 0; -1 -1 1 1 0]*(1/sqrt(3));
-stressesAtPoints = [0; 0]*(1/sqrt(3));
-[stresses, zcoords, xCoord] = el(1).computeStressThroughThickness(ed(:,plotEl), stressesAtPoints);
+stressesAtPoints = [0;0]*(1/sqrt(3));
+[stresses, zcoords, xCoord] = el(plotEl).computeStressThroughThickness(ed(:,plotEl), stressesAtPoints);
 
 
 %Plot all da shitz
@@ -42,6 +42,18 @@ for ip=1:size(stressesAtPoints,2)
     title(sprintf('sigma_{%s} - element %i', stresscmpname{stressComp}, plotEl))
 end
 end
+
+
+% %Von mises
+% for iel = 1:mesh.nel
+%     [stress, zz] = el(iel).computeStressAt(ed(:,iel),[0,0,0]');
+%     vm(iel) = sum(stress.stress.*(diag([1 1 1 2 2 2])*stress.stress));
+%     ey2d(:,iel) = mesh.ey([1 5 7 3],iel);
+%     ez2d(:,iel) = mesh.ez([1 5 7 3],iel);
+% end
+% figure;
+% fill(ey2d,ez2d,vm)
+
 % save('s_e3_stresses','stresses','zcoords')
 
 % save('stressEas_0_90','stresses','zcoords');

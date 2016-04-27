@@ -27,6 +27,7 @@ elseif(opt == 6)
 elseif(opt == 7)
 %     M = @(xi,eta,zeta) [0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0; 0 0 0 0 zeta, zeta*xi, zeta*eta, zeta*xi*eta; 0 0 0 0 0 0 0 0; [xi,0 xi*eta, 0 0 0 0 0; 0,eta,0,xi*eta  0 0 0 0]];
     M = @(xi,eta,zeta) [0 0 0 0 0 0 0 0 xi xi*eta 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 eta eta*xi 0 0 0; 0 0 0 0 zeta, zeta*xi, zeta*eta, zeta*xi*eta 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 xi eta xi*eta; [xi,0 xi*eta, 0 0 0 0 0  0 0 0 0 0 0 0; 0,eta,0,xi*eta  0 0 0 0 0 0 0 0 0 0 0]];
+% M = @(xi,eta,zeta) [0 0 0 0 0 0 0 0 xi xi*eta 0 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 eta eta*xi 0 0 0 0 0 0 0; 0 0 0 0 zeta, zeta*xi, zeta*eta, zeta*xi*eta 0 0 0 0 0 0 0 0 0 0 0; 0 0 0 0 0 0 0 0 0 0 0 0 xi eta xi*eta 0 0 0 0; [xi,0 xi*eta, 0 0 0 0 0  0 0 0 0 0 0 0 zeta xi*zeta 0 0; 0,eta,0,xi*eta  0 0 0 0 0 0 0 0 0 0 0 0 0 zeta eta*zeta]];
 end
 
 end

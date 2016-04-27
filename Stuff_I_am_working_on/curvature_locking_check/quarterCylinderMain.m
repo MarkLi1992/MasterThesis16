@@ -6,10 +6,10 @@ problem = 'SR1';
 
 [mesh, elprop, M, bc, ftrac] = quartercylinder_setup(problem, nnn);
 
-figure(88);
-solid8draw(mesh.ex,mesh.ey,mesh.ez); hold on;
-tmpEl = mesh.sideElements(3).elements;
-solid8draw(mesh.ex(:,tmpEl),mesh.ey(:,tmpEl),mesh.ez(:,tmpEl),8,'r'); view([-90 0]);
+% figure(88);
+% solid8draw(mesh.ex,mesh.ey,mesh.ez); hold on;
+% tmpEl = mesh.sideElements(3).elements;
+% solid8draw(mesh.ex(:,tmpEl),mesh.ey(:,tmpEl),mesh.ez(:,tmpEl),8,'r'); view([-90 0]);
 
 %Assemble
 n = mesh.nel*(mesh.neldofs)^2;
@@ -18,13 +18,13 @@ nPassed = 1; f=zeros(mesh.ndofs,1);
 
 for elIndex = 1:mesh.nel
     
-    el(elIndex) = Solid8StressRecLayered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
+%     el(elIndex) = Solid8StressRecLayered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
     
     eq = [-1e8*0 0 0]';
 %     [ Ke,fe ] = solid8ans(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, eq,[3,3,3]);
 %     [ Ke,fe ] = solid8(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, eq,[3,3,3]);
-%     [ Ke,fe ] = solid8anseas(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D,M, eq,[3,3,3]);
-    [Ke, fe] = el(elIndex).computeKandf(eq);
+    [ Ke,fe ] = solid8anseas(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D,M, eq,[3,3,3]);
+%     [Ke, fe] = el(elIndex).computeKandf(eq);
     
     % Assemble
     elDofs = mesh.edof(:,elIndex);
@@ -55,14 +55,14 @@ min(abs(a(tmpdof)));
 ed = a(mesh.edof);
 
 %Plot
-sfac = 1e0;
-exd = mesh.ex + ed(1:3:end,:)*sfac;
-eyd = mesh.ey + ed(2:3:end,:)*sfac;
-ezd = mesh.ez + ed(3:3:end,:)*sfac;
-
-figure(88);
-solid8draw(exd,eyd,ezd); hold on;
-view([-90 0])
+% sfac = 1e0;
+% exd = mesh.ex + ed(1:3:end,:)*sfac;
+% eyd = mesh.ey + ed(2:3:end,:)*sfac;
+% ezd = mesh.ez + ed(3:3:end,:)*sfac;
+% 
+% figure(88);
+% solid8draw(exd,eyd,ezd); hold on;
+% view([-90 0])
 % axis equal
 
 

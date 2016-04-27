@@ -28,6 +28,23 @@ classdef InterpolatorX2Y2Z2 < Interpolator
 
             %Derivatives of x and y
             dNdx = JT\dNdxi;
+            
+        end
+        
+        function [J] = eval_ContraBaseVectors(obj, lcoords, ex, ey, ez)
+            xi = lcoords(1); eta = lcoords(2); zeta = lcoords(3);
+            dNdxi =...
+            [ -((eta/2 - 1/2)*(zeta/2 - 1/2))/2, ((eta/2 - 1/2)*(zeta/2 - 1/2))/2, ((eta/2 + 1/2)*(zeta/2 - 1/2))/2, -((eta/2 + 1/2)*(zeta/2 - 1/2))/2, ((eta/2 - 1/2)*(zeta/2 + 1/2))/2, -((eta/2 - 1/2)*(zeta/2 + 1/2))/2, -((eta/2 + 1/2)*(zeta/2 + 1/2))/2, ((eta/2 + 1/2)*(zeta/2 + 1/2))/2;...
+             -((xi/2 - 1/2)*(zeta/2 - 1/2))/2, ((xi/2 + 1/2)*(zeta/2 - 1/2))/2, ((xi/2 - 1/2)*(zeta/2 - 1/2))/2, -((xi/2 + 1/2)*(zeta/2 - 1/2))/2, ((xi/2 - 1/2)*(zeta/2 + 1/2))/2, -((xi/2 + 1/2)*(zeta/2 + 1/2))/2, -((xi/2 - 1/2)*(zeta/2 + 1/2))/2, ((xi/2 + 1/2)*(zeta/2 + 1/2))/2;...
+             -((xi/2 - 1/2)*(eta/2 - 1/2))/2, ((xi/2 + 1/2)*(eta/2 - 1/2))/2, ((xi/2 - 1/2)*(eta/2 + 1/2))/2, -((xi/2 + 1/2)*(eta/2 + 1/2))/2, ((xi/2 - 1/2)*(eta/2 - 1/2))/2, -((xi/2 + 1/2)*(eta/2 - 1/2))/2, -((xi/2 - 1/2)*(eta/2 + 1/2))/2, ((xi/2 + 1/2)*(eta/2 + 1/2))/2];
+            
+            %Jacobian transpose 
+            JT=dNdxi*[ex', ey', ez'];
+            JT = JT';
+            for ii=1:3
+                JT(:,ii) = JT(:,ii)/norm(JT(:,ii));
+            end
+            J = JT;
         end
      
     end

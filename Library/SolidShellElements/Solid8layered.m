@@ -100,7 +100,7 @@ classdef Solid8layered < handle
                     cex = obj.ex(:,iel); cey = obj.ey(:,iel); cez = obj.ez(:,iel);
                     
                     ca = a(cedof);
-                    zetaCoord = linspace(-1,1,10);
+                    zetaCoord = linspace(-1,1,3);
                     for ii = 1:length(zetaCoord);
                         cp = [local_points(1,ip),local_points(2,ip),zetaCoord(ii)];
                         zCoord(stressItr) = obj.interp.eval_N(cp) * cez;
@@ -171,12 +171,17 @@ eta=coord(2);
 zeta=coord(3);
 
 %Shape functions
-[dNdx, ~] = interp.eval_dNdx(coord, ex', ey', ez');
+[dNdx, ~, JT] = interp.eval_dNdx(coord, ex', ey', ez');
+
+[JT0] = interp.eval_ContraBaseVectors([0,0,0], ex', ey', ez');
+% [JT0] = interp.eval_ContraBaseVectors(coord, ex', ey', ez');
+T0 = transMat( JT0 );
 
 %Bmatrix
 B = solid8Bmatrix(dNdx);
 
-stress = D*B*a;
+% stress = D*B*a;
+stress = (T0^-1)*D*B*a;
 end
 
 %The standard solid-elemenet stiffness

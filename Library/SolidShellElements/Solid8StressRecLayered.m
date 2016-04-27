@@ -27,12 +27,13 @@ classdef Solid8StressRecLayered < handle
     methods
         
         function obj = Solid8StressRecLayered(ex,ey,ez, elprop, M)
+            obj.elprop = elprop;
+            obj.M = M;
             
-           ex3 = [ex(1:4);ex]; ey3 = [ey(1:4);ey];
+            ex3 = [ex(1:4);ex]; ey3 = [ey(1:4);ey];
+            [obj.lx, obj.ly, obj.lz] = ex2lx(ex,ey,ez,obj.elprop.int_coordsG);
+           
             for i=1:elprop.nLam
-                obj.lx(:,i) = ex;
-                obj.ly(:,i) = ey;
-                obj.lz(:,i) = [[1 1 1 1]*elprop.int_coordsG(i) [1 1 1 1]*elprop.int_coordsG(i+1)]';
                  obj.lx3(:,i) = ex3;
                  obj.ly3(:,i) = ey3;
                  obj.lz3(:,i) = [[1 1 1 1]*elprop.int_coordsG(i), [1 1 1 1]*mean(elprop.int_coordsG([i, i+1])), [1 1 1 1]*elprop.int_coordsG(i+1)]';
@@ -42,12 +43,9 @@ classdef Solid8StressRecLayered < handle
             %Always simplest ir and intetp
             obj.interp = InterpolatorX2Y2Z2;
             obj.ir = IntegrationRule;
-            obj.ir.setupCubeRule(2,2,2);
+            obj.ir.setupCubeRule(3,3,3);
             
-            obj.lamIr = LayeredIntegrationRule(elprop.nLam, 2,2,2);
-            
-            obj.elprop = elprop;
-            obj.M = M;
+            obj.lamIr = LayeredIntegrationRule(elprop.nLam, 3,3,3);
             
             nEnhDofs = size(M(0,0,0),2);
             obj.submatrices.Ke = zeros(24);
@@ -84,7 +82,7 @@ classdef Solid8StressRecLayered < handle
                     %Enanced part
 %                      Mi = obj.M(ecoords(1),ecoords(2),ecoords(3));
                     Mtemp = obj.M(ecoords(1),ecoords(2),ecoords(3));
-                    T0 = transMat( JT0 );
+                    T0 = transMat( JT0' );
                     Mi = detJ0/detJ * T0*Mtemp;
                     
                     %Integrate
@@ -389,14 +387,16 @@ eta=coord(2);
 zeta=coord(3);
 
 %Shape functions
-[dNdx, ~] = interp.eval_dNdx(coord, ex', ey', ez');
+[dNdx, detJ] = interp.eval_dNdx(coord, ex', ey', ez');
 
 %Bmatrix
 B = solid8Bmatrix(dNdx);
 
 %EAS part
-warning('tfont forget to transforom)');
-M = Mi(xi,eta,zeta);
+[~, detJ0, JT0] = interp.eval_dNdx([0,0,0], ex', ey', ez');
+Mtmp = Mi(xi,eta,zeta);
+T0 = transMat( JT0' );
+M = detJ0/detJ * T0 * Mtmp;
 
 strains =  B*a + M*alpha;
 stress = D*strains;

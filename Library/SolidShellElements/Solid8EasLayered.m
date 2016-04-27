@@ -280,7 +280,7 @@ Le = zeros(nEnhDofs,24);
 fe = zeros(24,1);
 
 [~, detJ0, JT0] = interp.eval_dNdx([0,0,0], ex, ey, ez);
-
+T0 = transMat( JT0' );
 %Start loop
 for gp= ir.gps
     
@@ -291,7 +291,6 @@ for gp= ir.gps
     
     %Enanced part
     Mtemp = Mi(gp.local_coords(1),gp.local_coords(2),gp.local_coords(3));
-    T0 = transMat( JT0 );
     M = detJ0/detJ * T0*Mtemp;
     
     %Integrate

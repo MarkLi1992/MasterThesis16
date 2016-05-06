@@ -114,6 +114,11 @@ classdef Mesh < handle
             obj.neldofs = size(obj.edof,1); 
             obj.nelr = nelr; obj.nelphi = nelphi; obj.nelx = nelx;
             obj.lx = lx; obj.thickness = thickness; obj.inner_radius = inner_radius;
+            
+            obj.nelz = nelr;
+            obj.nely = nelphi;
+            obj.lz = thickness;
+            obj.ly = inner_radius*(pi/2);
        end
        
        function create_quarter_cylinder_mesh_stacked_solid_elements(obj,lx, inner_radius, thickness, nlam, nlamel, nelphi, nelx)

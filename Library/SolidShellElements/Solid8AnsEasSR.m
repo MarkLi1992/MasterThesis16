@@ -1,4 +1,4 @@
-classdef Solid8StressRecLayered < handle
+classdef Solid8AnsEasSR < handle
     
     properties
         elprop;
@@ -26,7 +26,7 @@ classdef Solid8StressRecLayered < handle
     
     methods
         
-        function obj = Solid8StressRecLayered(ex,ey,ez, elprop, M)
+        function obj = Solid8AnsEasSR(ex,ey,ez, elprop, M)
             obj.elprop = elprop;
             obj.M = M;
             
@@ -56,7 +56,8 @@ classdef Solid8StressRecLayered < handle
         function [K,f] = computeKandf(obj, eq)
             
             nEnhDofs = size(obj.M(0,0,0),2);
-
+            interpNormal = InterpolatorX2Y2;
+            
             %Init vectors
             Ke = zeros(24,24);
             He = zeros(nEnhDofs,nEnhDofs);
@@ -64,25 +65,47 @@ classdef Solid8StressRecLayered < handle
             fe = zeros(24,1);
             
             [~, detJ0, JT0] = obj.interp.eval_dNdx([0,0,0], obj.ex', obj.ey', obj.ez');
+            T0 = transMat( JT0' );
+                                
+            %Interpolation points for ANS
+            [B13a,B23b,B13c,B23d] = BAnsShear(obj.interp,  obj.ex', obj.ey', obj.ez', inv(T0));
+            [B33e,B33f,B33g,B33h] = BAnsNormal(obj.interp, obj.ex', obj.ey' ,obj.ez', inv(T0));
+            
             for ilay = 1:obj.elprop.nLam
                 D = obj.elprop.Dmatrices(:,:,ilay);
                 for gp = obj.lamIr.irs(ilay).gps
-                    
+                    %Get coords
                     lcoords = gp.local_coords;
+                    xi = lcoords(1); eta = lcoords(2); zeta = lcoords(3);
+                    
+                    %Transform gp-coord to element-coordinate
                     ecoords = lcoords;
                     ecoords(3) = obj.lamIr.getElementGaussCoordinate(lcoords(3), obj.elprop.int_coordsL(ilay:ilay+1));
                     
                     %Shape functions
                     Nxieta = obj.interp.eval_N(ecoords);
                     [dNdx, ~] = obj.interp.eval_dNdx(ecoords, obj.ex', obj.ey', obj.ez');
-                    [N,B] = solid8NandBmatrix(Nxieta,dNdx);
+                    [N,~] = solid8NandBmatrix(Nxieta,dNdx);
+                    
+                    %Interpolation matrix for ANS   
+                    Btmp = inv(T0)*solid8Bmatrix(dNdx);
+                    
+                    B13tilde = 0.5*(1-eta)*B13a + 0.5*(1+eta)*B13c; 
+                    Btmp(5,:) = B13tilde;
 
+                    B23tilde = 0.5*(1-xi)*B23d + 0.5*(1+xi)*B23b; 
+                    Btmp(6,:) = B23tilde;
+
+                    N33 = interpNormal.eval_N(gp.local_coords([1 2]));
+                    B33tilde =  N33(1)*B33e + N33(2)*B33f + N33(3)*B33h + N33(4)*B33g;
+                    Btmp(3,:) = B33tilde;
+                    B = T0*Btmp;
+                    
+                    %Determinant of j for integration
                     [~, detJ] = obj.interp.eval_dNdx(ecoords, obj.lx(:,ilay)', obj.ly(:,ilay)', obj.lz(:,ilay)');
-                   
+
                     %Enanced part
-%                      Mi = obj.M(ecoords(1),ecoords(2),ecoords(3));
                     Mtemp = obj.M(ecoords(1),ecoords(2),ecoords(3));
-                    T0 = transMat( JT0' );
                     Mi = detJ0/detJ * T0*Mtemp;
                     
                     %Integrate
@@ -117,9 +140,9 @@ classdef Solid8StressRecLayered < handle
                 coord1 =  [ local_point z1];
                 coord2 =  [ local_point z2];
                 
-                [stresses_bot] = solid8EasLayeredStress(obj.ex,obj.ey,obj. ez,a,alpha,...
+                [stresses_bot] = solid8anseasStress(obj.ex,obj.ey,obj. ez,a,alpha,...
                                                        obj.elprop.Dmatrices(:,:,ilay), obj.M, coord1, obj.interp);
-                [stresses_top] = solid8EasLayeredStress(obj.ex, obj.ey, obj.ez, a,alpha,...
+                [stresses_top] = solid8anseasStress(obj.ex, obj.ey, obj.ez, a,alpha,...
                                                        obj.elprop.Dmatrices(:,:,ilay), obj.M, coord2, obj.interp);
                 stresses(:,:,ilay) = [stresses_bot, stresses_top];
                 int = InterpolatorX2Y2Z2;
@@ -170,8 +193,9 @@ classdef Solid8StressRecLayered < handle
             %Global coordinates
             outcoords = obj.interp.eval_N(coords) * [obj.ex,obj.ey,obj.ez];
             cAlpha = obj.computeAlpha(a);
-            [stresses, strains] = solid8EasLayeredStress(obj.ex,obj.ey,obj.ez, a, cAlpha, cD, obj.M, coords, obj.interp);
-            
+%             [stresses, strains] = solid8EasLayeredStress(obj.ex,obj.ey,obj.ez, a, cAlpha, cD, obj.M, coords, obj.interp);
+            [stresses] = solid8anseasStress    (obj.ex,obj.ey,obj.ez, a, cAlpha, cD, obj.M, coords, obj.interp);
+            strains = stresses*0;
         end 
         
         function [] = postProcess2(obj, as)
@@ -472,35 +496,6 @@ classdef Solid8StressRecLayered < handle
         
     end
     
-end
-
-
-
-function [stress, strains] = solid8EasLayeredStress(ex,ey,ez,a,alpha,D,Mi,coord, interp)
-
-%Gauss points
-xi=coord(1);
-eta=coord(2);
-zeta=coord(3);
-
-%Shape functions
-[dNdx, detJ] = interp.eval_dNdx(coord, ex', ey', ez');
-
-%Bmatrix
-B = solid8Bmatrix(dNdx);
-
-%EAS part
-[~, detJ0, JT0] = interp.eval_dNdx([0,0,0], ex', ey', ez');
-Mtmp = Mi(xi,eta,zeta);
-T0 = transMat( JT0' );
-M = detJ0/detJ * T0 * Mtmp;
-
-[JT0] = interp.eval_ContraBaseVectors([0,0,0], ex', ey', ez');
-T = transMat( JT0 );
-
-strains =  B*a + M*alpha;
-stress = D*strains;
-% stress = (T^-1)*D*strains;
 end
 
 function stressgrads = evalStressGradientsFromStrain(interp, coord, as, DLT, lx, ly, lz)

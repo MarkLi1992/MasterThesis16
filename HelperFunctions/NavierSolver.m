@@ -1,3 +1,30 @@
+function NavierSolver()
+a = 1; b = 1; zz = 0.001;
+p = -1000;
+%  
+%         EL = 50E9;    
+%         ET = 9E9;   
+%         nuLT = 0.22;    
+%         GLT = 5E9; 
+%         GTT = 3.2E9;     
+%         nuTL = ET/EL*nuLT;
+      
+        EL = 174.6E9;  ET = 7E9;  nuLT = 0.25;    GLT = 3.5E9;   GTT = 1.4E9; nuTL = ET/EL*nuLT;
+        
+QLT = [EL/(1-nuLT*nuTL) (nuLT*ET)/(1-nuLT*nuTL) 0;...
+       (nuLT*ET)/(1-nuLT*nuTL) ET/(1-nuLT*nuTL) 0;...
+       0 0 GLT];
+
+QLTtilde = [GLT 0; 0 GTT];
+
+ang = [0 90 0 90 0 90 0 90 90 0 90 0 90 0 90 0]*pi/180;
+coord = linspace(-zz/2, zz/2,length(ang)+1); 
+
+% [maxabs_a] = navier(a,b,p,QLT,QLTtilde, ang, coord);
+[maxabs_a] = navier2(a,b,p,QLT,QLTtilde, ang, coord);
+fprintf('Max defl: %d\n' ,maxabs_a)
+end
+
 function [maxabs_a] = navier(a,b,p,QLT,QLTtilde, ang, coord)
 % Example Input can be found furthest down in the code
 
@@ -20,6 +47,32 @@ maxabs_a = w0(a/2,b/2);
 % surf(X, Y, w0(X,Y));
 % maxabs_a = max(max(abs(w0(X,Y))))
 end
+
+function [maxabs_a] = navier2(a,b,q0,QLT,QLTtilde, ang, coord)
+% Example Input can be found furthest down in the code
+
+[A,B,D,Atilde] = ABDAtilde(QLT,QLTtilde, ang, coord);
+
+xx = a/2; yy = b/2;
+w = 0;
+toM = 100; toN = 100;
+for m = 1:2:toM
+    for n = 1:2:toN
+        
+        qmn = 16*q0/pi^2/m/n; if(mod(m,2) == 0 || mod(n,2) == 0); qmn = 0; end;     
+
+        wmn = qmn/(pi^4*(D(1,1)*(m/a)^4 + ...
+            2*(D(1,2) + 2*D(3,3))*(m/a)^2*(n/b)^2 + ...
+            D(2,2)*(n/b)^4));   
+        
+        w = w + wmn*sin(m*pi*xx/a)*sin(n*pi*yy/b);
+        
+    end
+end
+
+maxabs_a = w;
+end
+
 function [A,B,D,Atilde] = ABDAtilde(QLT,QLTtilde, ang, coord)
 % Function calculating A, B and D matrix for a laminate
 
@@ -55,25 +108,3 @@ for ii = 1:nla
 end
 end
 
-function example_input()
-a = 0.6; b = 0.3; zz = 0.005;
-p = -5000;
- 
-        EL = 50E9;    
-        ET = 9E9;   
-        nuLT = 0.22;    
-        GLT = 5E9; 
-        GTT = 3.2E9;     
-        nuTL = ET/EL*nuLT;
-        
-QLT = [EL/(1-nuLT*nuTL) (nuLT*ET)/(1-nuLT*nuTL) 0;...
-       (nuLT*ET)/(1-nuLT*nuTL) ET/(1-nuLT*nuTL) 0;...
-       0 0 GLT];
-
-QLTtilde = [GLT 0; 0 GTT];
-
-ang = [0 90 0];
-coord = linspace(-zz/2, zz/2,length(ang)+1); 
-
-[maxabs_a] = navier(a,b,p,QLT,QLTtilde, ang, coord)
-end

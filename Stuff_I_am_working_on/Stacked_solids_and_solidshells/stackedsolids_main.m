@@ -1,6 +1,6 @@
 clear variables 
 %Set up propblem
-problem = ['CurvedBeam','_stacked'] %KonsolMedUtbredd   CurvedBeam
+problem = ['HybridStress2','_stacked']; %KonsolMedUtbredd   CurvedBeam   HybridStress2
 fprintf('Meshing\n');
 [mesh, elprop, M, bc, ftrac] = setup_problem(problem);
 eq = [0 0 0]'; 
@@ -20,6 +20,7 @@ for elIndex = 1:mesh.nel
     
     el(elIndex) = Solid8layered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, mesh.nlamel);
 %     el(elIndex) = Solid8EasLayered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, mesh.nlamel, M);
+%     el(elIndex) = Solid8AnsEasLayered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, mesh.nlamel, M);
     [Ke, fe] = el(elIndex).computeKandf(eq);
     
     % Assemble

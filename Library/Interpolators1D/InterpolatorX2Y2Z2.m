@@ -12,6 +12,15 @@ classdef InterpolatorX2Y2Z2 < Interpolator
             N = [ -(xi/2 - 1/2)*(eta/2 - 1/2)*(zeta/2 - 1/2), (xi/2 + 1/2)*(eta/2 - 1/2)*(zeta/2 - 1/2), (xi/2 - 1/2)*(eta/2 + 1/2)*(zeta/2 - 1/2), -(xi/2 + 1/2)*(eta/2 + 1/2)*(zeta/2 - 1/2), (xi/2 - 1/2)*(eta/2 - 1/2)*(zeta/2 + 1/2), -(xi/2 + 1/2)*(eta/2 - 1/2)*(zeta/2 + 1/2), -(xi/2 - 1/2)*(eta/2 + 1/2)*(zeta/2 + 1/2), (xi/2 + 1/2)*(eta/2 + 1/2)*(zeta/2 + 1/2)];
         end
         
+        function dNdxi = eval_dNdxi(obj, lcoords)
+           xi = lcoords(1); eta = lcoords(2); zeta = lcoords(3);
+            dNdxi =...
+            [ -((eta/2 - 1/2)*(zeta/2 - 1/2))/2, ((eta/2 - 1/2)*(zeta/2 - 1/2))/2, ((eta/2 + 1/2)*(zeta/2 - 1/2))/2, -((eta/2 + 1/2)*(zeta/2 - 1/2))/2, ((eta/2 - 1/2)*(zeta/2 + 1/2))/2, -((eta/2 - 1/2)*(zeta/2 + 1/2))/2, -((eta/2 + 1/2)*(zeta/2 + 1/2))/2, ((eta/2 + 1/2)*(zeta/2 + 1/2))/2;...
+             -((xi/2 - 1/2)*(zeta/2 - 1/2))/2, ((xi/2 + 1/2)*(zeta/2 - 1/2))/2, ((xi/2 - 1/2)*(zeta/2 - 1/2))/2, -((xi/2 + 1/2)*(zeta/2 - 1/2))/2, ((xi/2 - 1/2)*(zeta/2 + 1/2))/2, -((xi/2 + 1/2)*(zeta/2 + 1/2))/2, -((xi/2 - 1/2)*(zeta/2 + 1/2))/2, ((xi/2 + 1/2)*(zeta/2 + 1/2))/2;...
+             -((xi/2 - 1/2)*(eta/2 - 1/2))/2, ((xi/2 + 1/2)*(eta/2 - 1/2))/2, ((xi/2 - 1/2)*(eta/2 + 1/2))/2, -((xi/2 + 1/2)*(eta/2 + 1/2))/2, ((xi/2 - 1/2)*(eta/2 - 1/2))/2, -((xi/2 + 1/2)*(eta/2 - 1/2))/2, -((xi/2 - 1/2)*(eta/2 + 1/2))/2, ((xi/2 + 1/2)*(eta/2 + 1/2))/2];
+             
+        end
+        
         function [dNdx, detJ, JT] = eval_dNdx(obj, lcoords, ex, ey, ez)
             xi = lcoords(1); eta = lcoords(2); zeta = lcoords(3);
             dNdxi =...

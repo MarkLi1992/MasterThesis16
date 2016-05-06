@@ -40,7 +40,7 @@ elprop = ElementProperties();
 elprop.setup(thickness, angles, D);
 
 % Interpolation matrix
-M = getInterPolMatrix(7);
+M = getInterPolMatrix(4);
 
 % Load and boundary conditions
 bc = quartercylinderBC(problem, m.dof, m.sideElements);

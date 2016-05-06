@@ -74,6 +74,7 @@ while err > tol
     
     
     %Boundary condition
+    R = R - ftrac;
     R(bc(:,1)) = 0;
     err = norm(R);
     
@@ -96,10 +97,10 @@ exd = mesh.ex + ed(1:3:end,:);
 eyd = mesh.ey + ed(2:3:end,:);
 ezd = mesh.ez + ed(3:3:end,:);
 
-figure(3);
-solid8draw(exd,eyd,ezd); hold on;
-view(2)
-axis equal
+% figure(3);
+% solid8draw(exd,eyd,ezd); hold on;
+% view(2)
+% axis equal
 
 % close all;
 PostProcess_nonlin

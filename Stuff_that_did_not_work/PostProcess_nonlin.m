@@ -21,12 +21,12 @@ for iel = elementsToPlot
     plotStress = stress(1,:);
 
     figure
-    plot(plotStress,zcoords);%, plotZZglobal); 
+    plot(plotStress,zcoords,'-*');%, plotZZglobal); 
     hold on;
-    plot(plotCompStress,zcoordsComp,'*'); 
+    plot(plotCompStress,zcoordsComp,'r-*'); 
     legend('Stress','Compatible stress')
 %     keyboard;
     
 end
 
-save('ssx_e1_stresses','stress','zcoords','plotCompStress','zcoordsComp');
+% save('ssx_e12_stresses','stress','zcoords','stressComp','zcoordsComp');

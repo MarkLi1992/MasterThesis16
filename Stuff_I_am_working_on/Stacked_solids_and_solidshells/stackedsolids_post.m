@@ -7,7 +7,7 @@ ed = a(mesh.edof);
 % maxabs_a = max(abs(a));
 
 %Draw if you want to
-iwanttotdraw = 0;
+iwanttotdraw = 2;
 if(iwanttotdraw == 1)
     sfac = 1;
     exd = mesh.ex + ed(1:3:end,:)*sfac;
@@ -23,7 +23,8 @@ end
 
 %Find element at coordinate
 % plotEl = coordinate2element(mesh.ex,mesh.ey,mesh.ez, [mesh.lx/2, mesh.ly/2, mesh.lz/2])
-plotEl = 1125%805%90%50;
+plotEl = coordinate2element(mesh.ex,mesh.ey,mesh.ez, [mesh.lx/2, mesh.ly/2, mesh.lz/2])
+% plotEl = 50%805%90%50;
 %Get the stresses through the thickness at some points in a element
 % stressesAtPoints = [-1, 1 1 -1 0; -1 -1 1 1 0]*(1/sqrt(3));
 stressesAtPoints = [0;0]*(1/sqrt(3));
@@ -37,12 +38,13 @@ sitr = 1;
 for stressComp = [1 2 4 5 6 3]
 for ip=1:size(stressesAtPoints,2)
     subplot(2,3,sitr); sitr = sitr+1;
-    plot(stresses(ip).stress(stressComp,:), zcoords)
+    plot(stresses(ip).stress(stressComp,:), zcoords,'-*')
 %     title(sprintf('x=%.3f, y=%.3f', stressesAtPoints(1,ip), stressesAtPoints(2,ip) ))
-    title(sprintf('sigma_{%s} - element %i', stresscmpname{stressComp}, plotEl))
+    title(sprintf('%s - element %i', stresscmpname{stressComp}, plotEl))
 end
 end
 
+%save('ss_e12_stresses','stresses', 'zcoords')
 
 % %Von mises
 % for iel = 1:mesh.nel

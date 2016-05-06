@@ -197,7 +197,7 @@ classdef SolidShellLayered_v6 < handle
 %                            obj.getStressComponentDofs(6,[1:4,  9:12 17:20])]';
 
             sigmaBc = [lockedSigma, lockedSigma*0];
-            sigmaBc((end-3):end,2) = -50000;
+            sigmaBc((end-3):end,2) = -1000;
             
             allSigma = 1:obj.nStressDofs;
             freeSigma = setdiff(allSigma, lockedSigma);
@@ -217,7 +217,7 @@ classdef SolidShellLayered_v6 < handle
 %             beta   (freeSigma  ) = QQ(freeSigma,freeSigma)\(fbeta(freeSigma));
             dbetada(freeSigma,:) = QQ(freeSigma,freeSigma)\(dfbeta(freeSigma,:));
             
-            R = KK1*a + KK2*beta - fext;
+            R = KK1*a + KK2*beta;%; - fext;
             J = (KK1  + KK2*dbetada);
             
             %Save internal variables for element
@@ -258,7 +258,7 @@ classdef SolidShellLayered_v6 < handle
             for ilam = 1:obj.nLam
                 D = elprop.Dmatrices(:,:,ilam);
                 
-                zz = linspace(-1,1,10);
+                zz = linspace(-1,1,3);
                 for iz = 1:length(zz);
                     %Gauss points
                     lcoord = [0,0, zz(iz)]';
@@ -267,7 +267,7 @@ classdef SolidShellLayered_v6 < handle
                         lcoord(3), elprop.int_coordsL(ilam:ilam+1));
                     
                     %Shape functions
-                    [dNdx, ~] = obj.dispInterp.eval_dNdx(lcoord, obj.ex, obj.ey, obj.ez);
+                    [dNdx, ~] = obj.dispInterp.eval_dNdx(ecoords, obj.ex, obj.ey, obj.ez);
                     
                     %Bmatrix
                     B = solid8Bmatrix(dNdx);

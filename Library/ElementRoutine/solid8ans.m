@@ -40,9 +40,9 @@ for gp = ir.gps
     B23tilde = 0.5*(1-xi)*B23d + 0.5*(1+xi)*B23b; 
     Btmp(6,:) = B23tilde;
     
-    N33 = interpNormal.eval_N(gp.local_coords([1 2]));
-    B33tilde =  N33(1)*B33e + N33(2)*B33f + N33(3)*B33h + N33(4)*B33g;
-    Btmp(3,:) = B33tilde;
+%     N33 = interpNormal.eval_N(gp.local_coords([1 2]));
+%     B33tilde =  N33(1)*B33e + N33(2)*B33f + N33(3)*B33h + N33(4)*B33g;
+%     Btmp(3,:) = B33tilde;
 
     B = T0*Btmp;
     

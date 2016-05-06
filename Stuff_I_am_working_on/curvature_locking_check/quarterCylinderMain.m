@@ -19,11 +19,13 @@ nPassed = 1; f=zeros(mesh.ndofs,1);
 for elIndex = 1:mesh.nel
     
 %     el(elIndex) = Solid8StressRecLayered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
+%     el(elIndex) = Solid8AnsEasSR(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
     
     eq = [-1e8*0 0 0]';
-%     [ Ke,fe ] = solid8ans(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, eq,[3,3,3]);
-%     [ Ke,fe ] = solid8(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, eq,[3,3,3]);
-    [ Ke,fe ] = solid8anseas(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D,M, eq,[3,3,3]);
+%     [ Ke,fe ] = solid8ans(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, eq,[5,5,5]);
+%     [ Ke,fe ] = solid8(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, eq,[5,5,5]);
+    [ Ke,fe ] = solid8anseas(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D,M, eq,[5,5,5]);
+%     [ Ke,fe ] = solid8eas(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D,M, eq,[5,5,5]);
 %     [Ke, fe] = el(elIndex).computeKandf(eq);
     
     % Assemble

@@ -30,8 +30,10 @@ for elIndex = 1:mesh.nel
             nPassed = nPassed + 1;
         end
     end
-    f(elDofs) = f(elDofs) + fe + ftrac(:,elIndex);
+    f(elDofs) = f(elDofs) + fe;
 end
+
+f = f+ftrac;
 
 %Construct K-matrix
 K = sparse(rows,cols,data);
@@ -46,18 +48,18 @@ maxabs_a = max(abs(a));
 plotEl = coordinate2element(mesh.ex,mesh.ey,mesh.ez, [mesh.lx/2, mesh.ly/2, mesh.lz/2])
 
 % return;
-for i=1:mesh.nel%plotEl%
+for i=plotEl%1:mesh.nel%plotEl%
 %     [stresses, coords] = el(i).computeStressThroughThickness(a(mesh.edof(:,i)),[0;0]);
 %     figure
 %     plot(stresses.stress(1,:), coords(3,:))
     
     %shear force
-     [Tx1, Ty1, c1] = el(i).computeShearForce(a(mesh.edof(:,i)), [-1 0]);
-     [Tx2, Ty2, c2] = el(i).computeShearForce(a(mesh.edof(:,i)), [ 1 0]);
+%      [Tx1, Ty1, c1] = el(i).computeShearForce(a(mesh.edof(:,i)), [-1 0]);
+%      [Tx2, Ty2, c2] = el(i).computeShearForce(a(mesh.edof(:,i)), [ 1 0]);
 %     figure;
-    plot([c1(1),c2(1)], [Tx1,Tx2]); hold on;
+%     plot([c1(1),c2(1)], [Tx1,Tx2]); hold on;
     
-%     el(i).plzPostProcces(a(mesh.edof(:,i))); %computeShearForce(a(mesh.edof(:,i)))%
+    el(i).plzPostProcces(a(mesh.edof(:,i))); %computeShearForce(a(mesh.edof(:,i)))%
 %    stress2 = el(i).computeStressAt(a(mesh.edof(:,i)),[0 0 1])
 end
 

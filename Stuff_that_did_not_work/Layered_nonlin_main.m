@@ -4,7 +4,7 @@ clear variables;
 % addpath(genpath('HelperFunctions'))
 
 % problem = 'Konsol';
-problem = 'KonsolMedUtbredd';
+problem = 'CurvedBeam';
 % problem = 'InspandPlatta';
 % problem = 'HybridStress2';
 % problem = 'MembraneUnsymmetric';
@@ -43,8 +43,8 @@ while err > tol
 %             mesh.ey(:,elIndex)', mesh.ez(:,elIndex)', [2 2 3,2,3,3], M, elprop);
 
 
-         el(elIndex) = SolidShellLayered_v6(3,3,10, mesh.ex(:,elIndex)', ...
-            mesh.ey(:,elIndex)', mesh.ez(:,elIndex)', [4,3,3], M, elprop);
+         el(elIndex) = SolidShellLayered_v6(3,3,3, mesh.ex(:,elIndex)', ...
+            mesh.ey(:,elIndex)', mesh.ez(:,elIndex)', [2,2,2], M, elprop);
 
         
         elDofs = mesh.edof(:,elIndex);
@@ -103,7 +103,7 @@ ezd = mesh.ez + ed(3:3:end,:);
 % axis equal
 
 % close all;
-PostProcess_nonlin
+% PostProcess_nonlin
 
 
 

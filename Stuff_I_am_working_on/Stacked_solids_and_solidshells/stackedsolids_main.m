@@ -1,6 +1,6 @@
 clear variables 
 %Set up propblem
-problem = ['HybridStress2','_stacked']; %KonsolMedUtbredd   CurvedBeam   HybridStress2
+problem = ['KonsolMedUtbredd','_stacked']; %KonsolMedUtbredd   CurvedBeam   HybridStress2
 fprintf('Meshing\n');
 [mesh, elprop, M, bc, ftrac] = setup_problem(problem);
 eq = [0 0 0]'; 
@@ -14,7 +14,10 @@ nPassed = 1; f=zeros(mesh.ndofs,1);
 
 %Get stiffnessmatrix onece
 % el(1) = Solid8EasLayered(mesh.ex(:,1), mesh.ey(:,1), mesh.ez(:,1), elprop, mesh.nlamel, M);
-
+% elIndex = 1;
+% el(elIndex) = Solid8AnsEasLayered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, mesh.nlamel, M);
+% el(elIndex) = Solid8layered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, mesh.nlamel);
+% [Ke, fe] = el(elIndex).computeKandf(eq);
 fprintf('Assembling %i x %i elements\n',mesh.nel, mesh.nlamel);
 for elIndex = 1:mesh.nel
     
@@ -35,7 +38,7 @@ for elIndex = 1:mesh.nel
     end
     f(elDofs) = f(elDofs) + fe;
 %     f(elDofs) = f(elDofs) + fe + ftrac(:,elIndex);
-%     fprintf('Assembling for element %i \n',elIndex);
+    fprintf('Assembling for element %i/%i \n',elIndex,mesh.nel);
 end
 
 %Add traction forces
@@ -52,4 +55,4 @@ a = solveq(K,f,bc);
 maxabs_a = max(abs(a))
 fprintf('Completed\n');
 
-
+% save('SSsA3E3_61x61x20_AR10')

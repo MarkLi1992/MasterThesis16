@@ -8,9 +8,11 @@ p = -1000;
 %         GLT = 5E9; 
 %         GTT = 3.2E9;     
 %         nuTL = ET/EL*nuLT;
-      
-        EL = 174.6E9;  ET = 7E9;  nuLT = 0.25;    GLT = 3.5E9;   GTT = 1.4E9; nuTL = ET/EL*nuLT;
-        
+       
+EL = 50E9;     ET = 9E9;    nuLT = 0.22;    GLT = 5E9;  GTT = 3.2E9;  nuTL = ET/EL*nuLT;
+%         EL = 174.6E9;  ET = 7E9;  nuLT = 0.25;    GLT = 3.5E9;   GTT = 1.4E9; nuTL = ET/EL*nuLT;
+%          EL = 100e9;    ET = 100e9; nuLT = 0.3;    GLT = EL/(2*(nuLT+1)); GTT = GLT; nuTL = ET/EL*nuLT;
+         
 QLT = [EL/(1-nuLT*nuTL) (nuLT*ET)/(1-nuLT*nuTL) 0;...
        (nuLT*ET)/(1-nuLT*nuTL) ET/(1-nuLT*nuTL) 0;...
        0 0 GLT];
@@ -20,8 +22,8 @@ QLTtilde = [GLT 0; 0 GTT];
 ang = [15 -15]*pi/180;
 coord = linspace(-zz/2, zz/2,length(ang)+1); 
 
-[maxabs_a] = WHITNEY(a,b,p,QLT,QLTtilde, ang, coord)
-fprintf('Max defl: %d\n' ,maxabs_a)
+[maxabs_a] = WHITNEY(a,b,p,QLT,QLTtilde, ang, coord);
+fprintf('WHITNEY: Max defl: %d\n' ,maxabs_a);
 end
 
 function [maxabs_a] = WHITNEY(a,b,q0,QLT,QLTtilde, ang, coord)

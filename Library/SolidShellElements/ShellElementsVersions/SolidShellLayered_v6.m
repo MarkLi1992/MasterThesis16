@@ -101,6 +101,11 @@ classdef SolidShellLayered_v6 < handle
             Ai = zeros(obj.nStrainDofs, obj.nDispDofs);
             Ci = zeros(obj.nStrainDofs, obj.nStrainDofs);
             
+            %--new
+            [~, detJ0, JT0] = obj.dispInterp.eval_dNdx([0,0,0], obj.ex, obj.ey, obj.ez);
+            T0 = transMat( JT0' );
+            %--new
+            
             %Calculate alpha values
             for ilay = 1:obj.nLam
                 layD = elprop.Dmatrices(:,:,ilay);
@@ -142,6 +147,10 @@ classdef SolidShellLayered_v6 < handle
 
                     % Enanced part, eval in layered-system
                     Mi = obj.Mhat(ecoords(1), ecoords(2), ecoords(3));
+                    %--new
+                    Mi = detJ0/detJEl * T0*Mi;
+                    %--new
+                    
                     DM = layD*Mi;
                     DMz = DM([3 5 6],:);
                     
@@ -201,6 +210,7 @@ classdef SolidShellLayered_v6 < handle
             
             allSigma = 1:obj.nStressDofs;
             freeSigma = setdiff(allSigma, lockedSigma);
+            freeSigma = allSigma;
             
             %Solve for beta and derivate of beta wrt a
             %Caluclate righthandside of equations
@@ -213,8 +223,8 @@ classdef SolidShellLayered_v6 < handle
             dbetada = zeros(obj.nStressDofs,obj.nDispDofs);
             
             %Solve (dont forget the bc:s :-) )
-            beta   (freeSigma  ) = QQ(freeSigma,freeSigma)\(fbeta(freeSigma) - QQ(freeSigma,lockedSigma)*sigmaBc(:,2));
-%             beta   (freeSigma  ) = QQ(freeSigma,freeSigma)\(fbeta(freeSigma));
+%             beta   (freeSigma  ) = QQ(freeSigma,freeSigma)\(fbeta(freeSigma) - QQ(freeSigma,lockedSigma)*sigmaBc(:,2));
+            beta   (freeSigma  ) = QQ(freeSigma,freeSigma)\(fbeta(freeSigma));
             dbetada(freeSigma,:) = QQ(freeSigma,freeSigma)\(dfbeta(freeSigma,:));
             
             R = KK1*a + KK2*beta;%; - fext;

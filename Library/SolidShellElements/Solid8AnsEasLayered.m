@@ -99,7 +99,7 @@ classdef Solid8AnsEasLayered < handle
             
         end
         
-        function [stresses, zCoord, xCoord] = computeStressThroughThickness(obj,a, local_points)
+        function [stresses, zCoord, xCoord, yCoord] = computeStressThroughThickness(obj,a, local_points)
             
             npoints = size(local_points,2);
             
@@ -113,7 +113,7 @@ classdef Solid8AnsEasLayered < handle
                     cM = obj.M;
                     
                     ca = a(cedof);
-                    zetaCoord = linspace(-1,1,10);
+                    zetaCoord = linspace(-1,1,2);
                     for ii = 1:length(zetaCoord);
                         cp = [local_points(1,ip),local_points(2,ip),zetaCoord(ii)];
                         zCoord(stressItr) = obj.interp.eval_N(cp) * cez;
@@ -124,6 +124,7 @@ classdef Solid8AnsEasLayered < handle
                     end
                 end
                 xCoord(ip) = obj.interp.eval_N(cp) * cex;
+                yCoord(ip) = obj.interp.eval_N(cp) * cey;
             end
         end
         

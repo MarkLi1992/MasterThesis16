@@ -87,7 +87,7 @@ classdef Solid8layered < handle
             
         end
         
-        function [stresses, zCoord, xCoord] = computeStressThroughThickness(obj,a, local_points)
+        function [stresses, zCoord, xCoord, yCoord] = computeStressThroughThickness(obj,a, local_points)
             
             npoints = size(local_points,2);
             
@@ -110,6 +110,7 @@ classdef Solid8layered < handle
 
                 end
                 xCoord(ip) = obj.interp.eval_N(cp) * cex;
+                yCoord(ip) = obj.interp.eval_N(cp) * cey;
             end
 
         end
@@ -182,6 +183,7 @@ B = solid8Bmatrix(dNdx);
 
 % stress = D*B*a;
 stress = (T0^-1)*D*B*a;
+% stress = B*a;
 end
 
 %The standard solid-elemenet stiffness

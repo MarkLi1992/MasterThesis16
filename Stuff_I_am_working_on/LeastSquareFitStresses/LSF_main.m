@@ -1,10 +1,10 @@
-% clear variables 
-function maxabs_a = LSF_main(setupinfo)
+clear variables 
+% function maxabs_a = LSF_main(setupinfo)
 addpath('smearers')
 %Set up propblem
 
-problem = 'WhitneyCheck'; %KonsolMedUtbredd CurvedBeam  NavierCheck   HybridStress2 WhitneyCheck
-[mesh, elprop, M, bc, ftrac] = setup_problem(problem, setupinfo);
+problem = 'CurvedBeam'; %KonsolMedUtbredd CurvedBeam  NavierCheck   HybridStress2 WhitneyCheck  HybridStress2_sym_plate  HybridStress2_plate
+[mesh, elprop, M, bc, ftrac] = setup_problem(problem);%, setupinfo);
 
 %Assemble
 n = mesh.nel*(mesh.neldofs)^2;
@@ -15,8 +15,8 @@ for elIndex = 1:mesh.nel
     
 %     el(elIndex) = Solid8LSF(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop);Solid8StressRecLayered
 %     el(elIndex) = Solid8StressRecLayered(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
-%     el(elIndex) = Solid8AnsEasSR(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
-      el(elIndex) = setupinfo.funk(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
+    el(elIndex) = Solid8AnsEasSR(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
+%       el(elIndex) = setupinfo.funk(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop, M);
     eq = [0 0 0]';
     [Ke, fe] = el(elIndex).computeKandf(eq);
 %     [ Ke,fe ] = solid8(mesh.ex(:,elIndex), mesh.ey(:,elIndex), mesh.ez(:,elIndex), elprop.D, eq,[3,3,3]);

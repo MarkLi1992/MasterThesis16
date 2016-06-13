@@ -14,7 +14,7 @@ end
 
 totnel = prod(nnn,2);
 
-figure
+% figure
 plot(prod(nnn,2),disp)
 ylabel('Defl'); xlabel('Number of elements')
 % save('zSE4A3','totnel','disp')

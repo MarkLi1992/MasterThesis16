@@ -1,12 +1,12 @@
 clear all;
 
 syms x y z
-s(1).terms = {};
-s(2).terms = {};
+s(1).terms = {x};
+s(2).terms = {y};
 s(3).terms = {z, z*x , z*y, x*y*z};
-s(4).terms = {};
-s(5).terms = {x, z, x*y, x*z}%{x, x*y, (1/5 - z^2), x*(1/5 - z^2), y*(1/5 - z^2), x*y*(1/5 - z^2)};
-s(6).terms = {y, z, x*y, y*z}%{y, x*y, (1/5 - z^2), x*(1/5 - z^2), y*(1/5 - z^2), x*y*(1/5 - z^2)};
+s(4).terms = {x, y, x*y};
+s(5).terms = {}%{x, x*y, (1/5 - z^2), x*(1/5 - z^2), y*(1/5 - z^2), x*y*(1/5 - z^2)};
+s(6).terms = {}%{y, x*y, (1/5 - z^2), x*(1/5 - z^2), y*(1/5 - z^2), x*y*(1/5 - z^2)};
 
 n = size([s.terms],2);
 

@@ -41,7 +41,7 @@ elprop.setup(thickness, angles, D);
 
 % Interpolation matrix
 M = getInterPolMatrix(4);
-
+% M = @(x,y,z)reshape([x,0.0,0.0,0.0,0.0,0.0,0.0,y,0.0,0.0,0.0,0.0,0.0,0.0,z,0.0,0.0,0.0,0.0,0.0,x.*z,0.0,0.0,0.0,0.0,0.0,y.*z,0.0,0.0,0.0,0.0,0.0,x.*y.*z,0.0,0.0,0.0,0.0,0.0,0.0,x,0.0,0.0,0.0,0.0,0.0,y,0.0,0.0,0.0,0.0,0.0,x.*y,0.0,0.0],[6,9]);
 % Load and boundary conditions
 bc = quartercylinderBC(problem, m.dof, m.sideElements);
 

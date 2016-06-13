@@ -15,14 +15,16 @@ switch problem
         tractionInfo.tractions = {@(x,y) [0 0 -1000/(lx*ly)]'};
         
         %angles
-        angles = [0 90 0 90 90 0 90 0];
+        angles = [-15 15];
         
-        angles = setupinfo.angles;
-        M = getInterPolMatrix(setupinfo.M);
+%         angles = setupinfo.angles;
+%         M = getInterPolMatrix(setupinfo.M);
         
         %Material properties
-        EL = 174.6E9;  ET = 7E9;  nuLT = 0.25;    GLT = 3.5E9;   GTT = 1.4E9; nuTL = ET/EL*nuLT;
-        
+        EL = 50E9;     ET = 9E9;    nuLT = 0.22;    GLT = 5E9;  GTT = 3.2E9; 
+%         EL = 174.6E9;  ET = 7E9;  nuLT = 0.25;    GLT = 3.5E9;   GTT = 1.4E9; nuTL = ET/EL*nuLT;
+%          EL = 100e9;    ET = 100e9; nuLT = 0.3;    GLT = EL/(2*(nuLT+1)); GTT = GLT; 
+         
         D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
         
     case 'WhitneyCheck'
@@ -34,14 +36,15 @@ switch problem
         tractionInfo.tractions = {@(x,y) [0 0 -1000/(lx*ly)]'};
         
         %angles
-        angles = [0 90 0 90 90 0 90 0];
+        angles = [0 90 0];
         
-        angles = setupinfo.angles;
-        M = getInterPolMatrix(setupinfo.M);
+%         angles = setupinfo.angles;
+%         M = getInterPolMatrix(setupinfo.M);
         
         %Material properties
-        EL = 174.6E9;  ET = 7E9;  nuLT = 0.25;    GLT = 3.5E9;   GTT = 1.4E9; nuTL = ET/EL*nuLT;
-        
+        EL = 50E9;     ET = 9E9;    nuLT = 0.22;    GLT = 5E9;  GTT = 3.2E9; 
+%         EL = 174.6E9;  ET = 7E9;  nuLT = 0.25;    GLT = 3.5E9;   GTT = 1.4E9; nuTL = ET/EL*nuLT;
+%         EL = 100e9;    ET = 100e9; nuLT = 0.3;    GLT = EL/(2*(nuLT+1)); GTT = GLT; 
         D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
 
     case 'KonsolMedUtbredd'
@@ -54,7 +57,7 @@ switch problem
         tractionInfo.tractions = {@(x,y) [0 0 -100/(lx*ly)]',   @(x,y) [100000/(ly*lz) 0 0]'};
         
         %angles
-        angles = [0 90 0];% 90];
+        angles = [0 90];% 90];
         
         %Material properties
         EL = 174.6E9;
@@ -66,6 +69,31 @@ switch problem
         
         D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
 %         D = hooke(4,100e9,0.25);
+
+    case 'KonsolMedUtbredd_stacked'
+        lx = 1; ly=0.1; lz = 0.01;
+%         nelx = 255; nely=25; nlamel=5;
+        nelx = 200; nely=20; nlamel=5;
+        
+        tractionInfo.sides = [5];
+        tractionInfo.tractions = {@(x,y) [0 0 -1000/(lx*ly)]', @(x,y) [0 0 -100/(lx*ly)]'};
+        
+        angles = [0]; aspect = (lx/nelx)/(lz/(nlamel*length(angles)))
+        
+        nlam = length(angles);
+        %Material properties
+%         EL = 174.6E9;
+%         ET = 7E9;
+%         nuLT = 0.25;
+%         GLT = 3.5E9;
+%         GTT = 1.4E9;
+%         nuTL = ET/EL*nuLT;
+        
+%         D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+         D = hooke(4,100e9,0);
+        %independent mesh
+        m = Mesh();
+        m.create_cube_mesh_stacked_solid_elements(lx,ly,lz,nelx,nely,nlam, nlamel);
         
     case 'InspandPlatta'
         lx = 0.1; ly=0.1; lz = 0.002;
@@ -137,36 +165,11 @@ switch problem
         D = hooke(4,100e9,0.25);
         
         m = Mesh();
-        m.create_cube_mesh_stacked_solid_elements(lx,ly,lz,nelx,nely,nlam, nlamel);
-        
-    case 'KonsolMedUtbredd_stacked'
-        lx = 1; ly=0.1; lz = 0.01;
-%         nelx = 255; nely=25; nlamel=5;
-        nelx = 101; nely=1; nlamel=6;
-        
-        tractionInfo.sides = [5];
-        tractionInfo.tractions = {@(x,y) [0 0 -100/(lx*ly)]'};
-        
-        angles = [0 90]; aspect = (lx/nelx)/(lz/(nlamel*length(angles)))
-        
-        nlam = length(angles);
-        %Material properties
-        EL = 174.6E9;
-        ET = 7E9;
-        nuLT = 0.25;
-        GLT = 3.5E9;
-        GTT = 1.4E9;
-        nuTL = ET/EL*nuLT;
-        
-        D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
-%          D = hooke(4,100e9,0.25);
-        %independent mesh
-        m = Mesh();
-        m.create_cube_mesh_stacked_solid_elements(lx,ly,lz,nelx,nely,nlam, nlamel);
+        m.create_cube_mesh_stacked_solid_elements(lx,ly,lz,nelx,nely,nlam, nlamel);    
         
     case 'CurvedBeam'
-        inner_radius=4.12; lx = 0.5; thickness = 0.2;  lz = thickness;
-        nelr = 1; nelphi=6; nelx=1;
+        inner_radius=4.12; lx = 0.1; thickness = 0.2;  lz = thickness;
+        nelr = 1; nelphi=10; nelx=1;
         
         tractionInfo.sides = [3];
         tractionInfo.tractions = {@(x,y) [0 0 -1/(thickness*lx)]'};
@@ -175,7 +178,7 @@ switch problem
         
         nlam = length(angles);
         %Material properties
-        EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9;nuTL = ET/EL*nuLT;
+%         EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9;nuTL = ET/EL*nuLT;
         
 %         D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
          D = hooke(4,1e7,0.25);
@@ -185,20 +188,20 @@ switch problem
         m.create_quarter_cylinder_mesh(lx, inner_radius, thickness, nelr, nelphi, nelx)
         
     case 'CurvedBeam_stacked'
-        inner_radius=4.12; lx = 0.1; thickness = 0.2; lz = thickness;
-        nlamel = 8; nelphi=100; nelx=1;
+        inner_radius = 4.12; lx = 0.1; thickness = 0.2; lz = thickness;
+        nlamel = 1; nelphi=60; nelx=1;
         
         tractionInfo.sides = [3];
         tractionInfo.tractions = {@(x,y) [0 0 -1/(thickness*lx)]'};%*sin(pi*y/ly)
         
-        angles = [0 90]; 
+        angles = [0]; 
         
         nlam = length(angles); ap = (inner_radius*pi/nelphi)/(thickness/(nlam*nlamel));
         %Material properties
-        EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9;nuTL = ET/EL*nuLT;
+%         EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9;nuTL = ET/EL*nuLT;
         
-        D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
-%          D = hooke(4,1e7,0.25);
+%         D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+         D = hooke(4,1e7,0.25);
         
         %independent mesh
         m = Mesh();
@@ -231,13 +234,13 @@ switch problem
         m.create_cube_mesh_stacked_solid_elements(lx,ly,lz,nelx,nely,nlam, nlamel);
         
     case 'HybridStress2'
-        lx = 1; ly=0.1; lz = 0.025;
-        nelx = 21; nely=1; nelz=1;
+        lx = 1; ly=0.25; lz = 0.025;
+        nelx = 110; nely=1; nelz=1;
 
         tractionInfo.sides = [5];
         tractionInfo.tractions = {@(x,y) [0 0 -1000*sin(pi*x/lx)]'};
         
-        angles = [0 90 0]; 
+        angles = [0 90 0]; aspect = (lx/nelx)/(lz/nelz)
         
         %Material properties
         EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9; nuTL = ET/EL*nuLT;
@@ -246,13 +249,83 @@ switch problem
 %         D = hooke(4,100e9,0.25);
 
     case 'HybridStress2_stacked'
-        lx = 1; ly=0.1; lz = 0.1;
-        nelx = 100; nely=1; nlamel=6;
+        lx = 1; ly=0.25; lz = 0.025;
+        nelx = 110; nely=1; nlamel=10;
+
+        tractionInfo.sides = [5];   
+        tractionInfo.tractions = {@(x,y) [0 0 -1000*sin(pi*x/lx)]'};
+        
+        angles = [0 90 0]; aspect = (lx/nelx)/(lz/(nlamel*length(angles)))
+        
+        %Material properties
+        EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9; nuTL = ET/EL*nuLT;
+        
+        D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+%         D = hooke(4,100e9,0.25);
+        
+        nlam = length(angles);
+
+        m = Mesh();
+        m.create_cube_mesh_stacked_solid_elements(lx,ly,lz,nelx,nely,nlam, nlamel);
+        
+    case 'HybridStress2_plate'
+        lx = 0.1; ly=0.1; lz = 0.01;
+        nelx = 61; nely=61; nelz=1;
 
         tractionInfo.sides = [5];
-        tractionInfo.tractions = {@(x,y) [0 0 -1000*sin(pi*y/ly)/(lx*ly)]'};
+        tractionInfo.tractions = {@(x,y) [0 0 -1000]'}; %*sin(pi*x/lx)*sin(pi*y/ly)
         
-        angles = [0 90 0]; 
+        angles = [90 -45 45 0]; aspect = (lx/nelx)/(lz/nelz);
+        
+        %Material properties
+        EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9; nuTL = ET/EL*nuLT;
+        
+        D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+%         D = hooke(4,100e9,0.25);
+
+    case 'HybridStress2_plate_stacked'
+        lx = 0.1; ly=0.1; lz = 0.01;
+        nelx = 61; nely=61; nlamel=5;
+
+        tractionInfo.sides = [5];   
+        tractionInfo.tractions = {@(x,y) [0 0 -1000]'};%*sin(pi*x/lx)*sin(pi*y/ly)
+        
+        angles = [90 -45 45 0]; aspect = (lx/nelx)/(lz/(nlamel*length(angles)))
+        
+        %Material properties
+        EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9; nuTL = ET/EL*nuLT;
+        
+        D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+%         D = hooke(4,100e9,0.25);
+        
+        nlam = length(angles);
+
+        m = Mesh();
+        m.create_cube_mesh_stacked_solid_elements(lx,ly,lz,nelx,nely,nlam, nlamel);
+        
+    case 'HybridStress2_sym_plate'
+        lx = 0.1/2; ly=0.1/2; lz = 0.001;
+        nelx = 30; nely=30; nelz=1;
+
+        tractionInfo.sides = [5];
+        tractionInfo.tractions = {@(x,y) [0 0 -1000]'}; %*sin(pi*x/lx)*sin(pi*y/ly)
+        
+        angles = [90 -45 45 0]; aspect = (lx/nelx)/(lz/nelz);
+        
+        %Material properties
+        EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9; nuTL = ET/EL*nuLT;
+        
+        D = hooke_trans_iso(EL, ET, nuLT, GLT, GTT);
+%         D = hooke(4,100e9,0.25);
+
+    case 'HybridStress2_sym_plate_stacked'
+        lx = 0.1; ly=0.1; lz = 0.005;
+        nelx = 30; nely=101; nlamel=5;
+
+        tractionInfo.sides = [5];   
+        tractionInfo.tractions = {@(x,y) [0 0 -1000]'};%*sin(pi*x/lx)*sin(pi*y/ly)
+        
+        angles = [90 -45 45 0]; aspect = (lx/nelx)/(lz/(nlamel*length(angles)))
         
         %Material properties
         EL = 174.6E9;ET = 7E9;nuLT = 0.25;GLT = 3.5E9;GTT = 1.4E9; nuTL = ET/EL*nuLT;
@@ -280,7 +353,7 @@ end
 
 % Interpolation matrix
 if ~(exist('M','var'))
-M = getInterPolMatrix(4);
+M = getInterPolMatrix(1);
 end
 
 % Load and boundary conditions

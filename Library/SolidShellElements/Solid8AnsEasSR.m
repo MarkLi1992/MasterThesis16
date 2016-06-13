@@ -536,16 +536,16 @@ function stressgrads = evalGradients2(lx, ly, lz, interp, as, coord, dim)
     [JT0] = interp.eval_ContraBaseVectors(coord, lx', ly', lz');
     T = transMat( JT0 );
 % 
-    for i=1:8
-        ind = (1:6) + (6*(i-1));
-       newAs(ind,1) = T*as(ind,1);
-    end
-    as = newAs;
+%     for i=1:8
+%         ind = (1:6) + (6*(i-1));
+%        newAs(ind,1) = T*as(ind,1);
+%     end
+%     as = newAs;
 
     %Derivatives of N-matrix
-%     dN = interp.eval_dNdx(coord, lx',ly',lz');
+    [dNxy,~,Jscale] = interp.eval_dNdx(coord, lx',ly',lz');
 %     dN = (JT0)*dN;
-    dN = interp.eval_dNdxi(coord);
+    dN = inv(JT0)*dNxy;%inv(Jscale)*interp.eval_dNdxi(coord);
     dNdx = solid8NMatrix(dN(1,:),dim);
     dNdy = solid8NMatrix(dN(2,:),dim);
     

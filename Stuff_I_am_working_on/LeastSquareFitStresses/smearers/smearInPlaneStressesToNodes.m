@@ -1,6 +1,6 @@
 function [as] = smearInPlaneStressesToNodes(mesh, el, a)
-% components = [1 2 3 4 5 6];   
-components = [1 2 4];
+components = [1 2 3 4 5 6];   
+% components = [1 2 4];
 ncmp = length(components);
 
 ed = a(mesh.edof);

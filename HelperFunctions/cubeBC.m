@@ -28,16 +28,50 @@ elseif strcmp('InspandPlatta', opt) || strcmp('InspandPlatta_stacked',opt)
     ldofs = ldofs(:);
     bc = [ldofs, ldofs*0];
 
-elseif(strcmp('HybridStress2', opt))   ||   (strcmp('HybridStress2_stacked', opt))
+elseif(strcmp('HybridStress2', opt))   ||   (strcmp('HybridStress2_stacked', opt)) 
     side1bottomDofs = dof(      sideElements(1).nodes(1:2,:)    ,1:3);
     side1bottomDofs = side1bottomDofs(:);
-    side2bottomYZDofs = dof(      sideElements(2).nodes(1:2,:)    ,1:3);
+    side2bottomYZDofs = dof(      sideElements(2).nodes(1:2,:)    ,2:3);
     side2bottomYZDofs = side2bottomYZDofs(:);
     ldofs = [side1bottomDofs; side2bottomYZDofs];
 %     ldofs = dof([side1],1:3); ldofs = ldofs(:);
 %     ldofs = [ldofs; side2bottomYZDofs];
     bc = [ldofs, 0*ldofs];
-   
+elseif  (strcmp('HybridStress2_plate', opt)) || (strcmp('HybridStress2_plate_stacked', opt))
+    
+%     ldofs = dof([side1;side2;side3;side4], 1:3);
+%     ldofs = ldofs(:);
+%     bc = [ldofs, ldofs*0];
+%     return;
+    
+    side1bottomDofs = dof(      sideElements(1).nodes(1:2,:)    ,1:3);
+    side1bottomDofs = side1bottomDofs(:);
+    side2bottomYZDofs = dof(      sideElements(2).nodes(1:2,:)    ,2:3);
+    side2bottomYZDofs = side2bottomYZDofs(:);
+    ldofs = [side1bottomDofs; side2bottomYZDofs];
+bc = [ldofs, 0*ldofs];
+%     side1 = sideElements(1).nodes(1:2,:); side1 = unique(side1(:));
+%     side2 = sideElements(2).nodes(1:2,:); side2 = unique(side2(:));
+%     side3 = sideElements(3).nodes(1:2,:); side3 = unique(side3(:));
+%     side4 = sideElements(4).nodes(1:2,:); side4 = unique(side4(:));
+%     bno = unique([side1;side2;side3;side4]);
+%     ldofs = dof(bno,1:3); ldofs = ldofs(:);
+%     bc = [ldofs, 0*ldofs];
+elseif  (strcmp('HybridStress2_sym_plate', opt)) || (strcmp('HybridStress2_sym_plate_stacked', opt))
+    
+    side1bc = dof(      sideElements(1).nodes(1:2,:)    ,1:3);
+    side1bc = side1bc(:);
+    side3bc = dof(      sideElements(3).nodes(1:2,:)    ,1:3);
+    side3bc = side3bc(:);
+    
+    side2bc = dof(      sideElements(2).nodes(1:4,:)    ,1:2); side2bc = side2bc(:);
+    
+    
+    side4bc = dof(      sideElements(4).nodes(1:4,:)    ,1:2); side4bc = side4bc(:);
+    
+    ldofs = unique([side1bc; side3bc; side2bc;side4bc]);
+    bc = [ldofs, 0*ldofs];
+    
 elseif(strcmp('MembraneUnsymmetric', opt))
     ldofs = dof(side1,1:3);
     ldofs = ldofs(:);
@@ -48,11 +82,17 @@ elseif(strcmp('CurvedBeam', opt)) || strcmp('CurvedBeam_stacked',opt)
     ldofs1 = ldofs1(:);
     bc = [ldofs1,ldofs1*0];
 elseif(strcmp('NavierCheck', opt))
+    
+    
+%     ldofs = dof([side1;side2;side3;side4], 1:3);
+%     ldofs = ldofs(:);
+%     bc = [ldofs, ldofs*0]; return;
+    %--
     side1 = sideElements(1).nodes(1:2,:); side1 = unique(side1(:));
     side2 = sideElements(2).nodes(1:2,:); side2 = unique(side2(:));
     side3 = sideElements(3).nodes(1:2,:); side3 = unique(side3(:));
     side4 = sideElements(4).nodes(1:2,:); side4 = unique(side4(:));
-    
+    %---
     bno = unique([side1;side2;side3;side4]);
     bdofsz = dof(bno,3);
     
@@ -60,6 +100,14 @@ elseif(strcmp('NavierCheck', opt))
     ldofs = [bdofsz; cornerDofs];
     
     bc = [ldofs,ldofs*0];
+    %---
+    bno = unique([side1;side2;side3;side4]);
+    bdofsxyz = dof(bno,1:3); bdofsxyz = bdofsxyz(:);
+    
+    ldofs = bdofsxyz;
+    
+    bc = [ldofs,ldofs*0];
+    
     elseif(strcmp('WhitneyCheck', opt))
     side1 = sideElements(1).nodes(1:2,:); side1 = unique(side1(:));
     side2 = sideElements(2).nodes(1:2,:); side2 = unique(side2(:));
